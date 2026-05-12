@@ -216,8 +216,7 @@
             width: 100%;
             overflow: hidden;
         }
-        #app-view.hidden { display: none; }
-
+        
         /* ── Sidebar ── */
         .sidebar {
             width: 260px;
@@ -1125,8 +1124,15 @@
             const result = await res.json();
             if (result.success === true || result.status === 'success') {
                 isAuthenticated = true;
+                
+                // IMPORTANT BUG FIX: We must remove the "hidden" class from app-view 
+                // to prevent `.hidden { display: none !important; }` from blocking it.
+                document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('login-view').style.display = 'none';
+
+                document.getElementById('app-view').classList.remove('hidden');
                 document.getElementById('app-view').style.display = 'flex';
+                
                 fetchData();
             } else {
                 hideLoading();
@@ -1152,7 +1158,13 @@
         document.getElementById('userId').value = '';
         document.getElementById('password').value = '';
         document.getElementById('login-error').classList.add('hidden');
+        
+        // Hide app-view properly
+        document.getElementById('app-view').classList.add('hidden');
         document.getElementById('app-view').style.display = 'none';
+
+        // Show login view properly
+        document.getElementById('login-view').classList.remove('hidden');
         document.getElementById('login-view').style.display = 'flex';
     }
 
@@ -1163,7 +1175,8 @@
             const res = await fetch(`${SCRIPT_URL}?action=getAssets`);
             const result = await res.json();
             if (result.success === true || result.status === 'success') {
-                appData = result.data;
+                // IMPORTANT: Ensure appData defaults to a valid array even if API sends null
+                appData = Array.isArray(result.data) ? result.data : [];
                 updateDashboard();
                 if (document.getElementById('view-assets').classList.contains('active')) renderTable(appData);
             } else {
