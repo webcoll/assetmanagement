@@ -8,6 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
@@ -185,14 +189,17 @@
 
                 <!-- VIEW 2: ASSET LIST -->
                 <div id="view-assets" class="hidden max-w-7xl mx-auto space-y-4 sm:space-y-6 fade-in h-full flex flex-col">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800">Asset Directory</h2>
                             <p id="list-subtitle" class="text-gray-500 text-sm mt-1">Showing all active assets</p>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto flex-wrap justify-end">
                             <button id="clear-filter-btn" onclick="clearFilters()" class="hidden w-full sm:w-auto bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors text-center">
                                 Clear Filters
+                            </button>
+                            <button onclick="exportPDF()" class="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700 px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
+                                <i class="fas fa-file-pdf"></i> Export PDF
                             </button>
                             <button onclick="switchView('add')" class="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
                                 <i class="fas fa-plus"></i> Add New Asset
@@ -452,6 +459,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6JlwSwciX7qhLVo8qusXfSxCfyePeCZ9fVakUafFkG1_SQPZLFLRiZ3ZYcxB_ZOYMaw/exec'; 
 
         let appData = [];
+        let currentDisplayedData = []; // To track filtered state for PDF export
         let isAuthenticated = false;
         let currentModalAsset = null;
 
@@ -547,6 +555,7 @@
         function logout() {
             isAuthenticated = false;
             appData = [];
+            currentDisplayedData = [];
             document.getElementById('userId').value = '';
             document.getElementById('password').value = '';
             document.getElementById('login-error').classList.add('hidden');
@@ -617,6 +626,75 @@
             document.getElementById('stat-warranty').innerText = warrantyEndingCount;
         }
 
+        // PDF EXPORT LOGIC
+        function exportPDF() {
+            if (!currentDisplayedData || currentDisplayedData.length === 0) {
+                showToast("No data to export", "error");
+                return;
+            }
+
+            // Initialize jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape'); // Landscape format gives more room for columns
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US');
+
+            // Header Settings
+            doc.setFontSize(18);
+            doc.setTextColor(40, 40, 40);
+            doc.text(`Asset Report As on ${dateStr}`, 14, 22);
+            
+            doc.setFontSize(11);
+            doc.setTextColor(100, 100, 100);
+            const subtitle = document.getElementById('list-subtitle').innerText;
+            doc.text(subtitle, 14, 30);
+
+            // Setup Table Structure
+            const tableColumn = ["Asset Name", "Purchase Date", "Warranty End", "Service Due", "Provider", "Contact", "Address"];
+            const tableRows = [];
+
+            // Populate rows based on the CURRENT filter
+            currentDisplayedData.forEach(asset => {
+                const assetData = [
+                    asset.name || '-',
+                    formatDate(asset.purchaseDate),
+                    formatDate(asset.warrantyDate),
+                    formatDate(asset.serviceDate),
+                    asset.spName || '-',
+                    asset.spContact || '-',
+                    asset.spAddress || '-'
+                ];
+                tableRows.push(assetData);
+            });
+
+            // Generate Table utilizing jsPDF-AutoTable
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 35,
+                theme: 'striped',
+                headStyles: { fillColor: [37, 99, 235] }, // Tailwind blue-600
+                styles: { fontSize: 9, cellPadding: 3 },
+                columnStyles: {
+                    0: { cellWidth: 40 }, // Asset name slightly wider
+                    6: { cellWidth: 50 }  // Address gets the most width
+                },
+                didDrawPage: function (data) {
+                    // Footer (Date & Time and Page Number)
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    const footerStr = `Generated on ${dateStr} at ${timeStr} | Page ${doc.internal.getNumberOfPages()}`;
+                    doc.text(footerStr, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            // Trigger file download
+            doc.save(`Asset_Report_${dateStr.replace(/,/g, '').replace(/ /g, '_')}.pdf`);
+            showToast("PDF exported successfully!", "success");
+        }
+
         // TABLE RENDERING & FILTERING
         function filterAssets(type) {
             let filtered = [];
@@ -643,6 +721,7 @@
         }
 
         function renderTable(data) {
+            currentDisplayedData = data; // Update tracking variable for PDF export
             const tbody = document.getElementById('asset-table-body');
             const emptyState = document.getElementById('empty-state');
             tbody.innerHTML = '';
