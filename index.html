@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Asset Management System</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,17 +23,17 @@
         @keyframes modalPop { 0% { opacity: 0; transform: scale(0.95) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
     </style>
 </head>
-<body class="text-gray-800 antialiased h-screen flex flex-col">
+<body class="text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- FULL SCREEN LOADER -->
     <div id="global-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center hidden">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <p id="loader-text" class="text-lg font-semibold text-gray-700">Data Loading or Updating...</p>
+        <p id="loader-text" class="text-lg font-semibold text-gray-700 text-center px-4">Data Loading or Updating...</p>
     </div>
 
     <!-- LOGIN SCREEN -->
-    <div id="login-view" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md m-4 border border-gray-100 fade-in">
+    <div id="login-view" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 fade-in">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
                     <i class="fas fa-boxes"></i>
@@ -83,7 +83,7 @@
     <!-- MAIN APPLICATION UI -->
     <div id="app-view" class="hidden flex h-full overflow-hidden w-full">
         
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Desktop) -->
         <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-2xl flex-shrink-0 hidden md:flex z-20">
             <div class="p-6 flex items-center gap-3 border-b border-slate-800">
                 <i class="fas fa-boxes text-blue-400 text-2xl"></i>
@@ -113,70 +113,70 @@
         <main class="flex-1 flex flex-col h-full w-full bg-gray-50 relative overflow-hidden">
             
             <!-- Mobile Header -->
-            <header class="md:hidden bg-white shadow-sm border-b px-4 py-3 flex justify-between items-center z-10 flex-shrink-0">
+            <header class="md:hidden bg-white shadow-sm border-b px-4 py-3 flex justify-between items-center z-30 flex-shrink-0 relative">
                 <div class="flex items-center gap-2 text-blue-600">
                     <i class="fas fa-boxes text-xl"></i>
                     <span class="font-bold text-lg text-gray-800">AssetMS</span>
                 </div>
-                <button id="mobile-menu-btn" class="text-gray-500 hover:text-gray-800 focus:outline-none p-2">
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-gray-500 hover:text-gray-800 focus:outline-none p-2 rounded-md hover:bg-gray-100 transition-colors">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </header>
 
             <!-- Mobile Menu Dropdown -->
-            <div id="mobile-menu" class="hidden md:hidden absolute top-[60px] left-0 right-0 bg-white shadow-lg border-b z-20 fade-in">
-                <nav class="flex flex-col p-2 space-y-1">
-                    <button onclick="switchView('dashboard'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-md hover:bg-gray-50 text-gray-700 font-medium"><i class="fas fa-chart-pie w-6 text-center text-blue-500"></i> Dashboard</button>
-                    <button onclick="switchView('assets'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-md hover:bg-gray-50 text-gray-700 font-medium"><i class="fas fa-list w-6 text-center text-blue-500"></i> All Assets</button>
-                    <button onclick="switchView('add'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-md hover:bg-gray-50 text-gray-700 font-medium"><i class="fas fa-plus-circle w-6 text-center text-blue-500"></i> Add Asset</button>
-                    <div class="border-t my-1"></div>
-                    <button onclick="logout()" class="text-left px-4 py-3 rounded-md hover:bg-red-50 text-red-600 font-medium"><i class="fas fa-sign-out-alt w-6 text-center"></i> Logout</button>
+            <div id="mobile-menu" class="hidden md:hidden absolute top-[60px] left-0 right-0 bg-white shadow-xl border-b z-20 fade-in flex flex-col">
+                <nav class="flex flex-col p-3 space-y-1">
+                    <button onclick="switchView('dashboard'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-lg hover:bg-blue-50 active:bg-blue-100 text-gray-700 font-medium transition-colors"><i class="fas fa-chart-pie w-6 text-center text-blue-500"></i> Dashboard</button>
+                    <button onclick="switchView('assets'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-lg hover:bg-blue-50 active:bg-blue-100 text-gray-700 font-medium transition-colors"><i class="fas fa-list w-6 text-center text-blue-500"></i> All Assets</button>
+                    <button onclick="switchView('add'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-lg hover:bg-blue-50 active:bg-blue-100 text-gray-700 font-medium transition-colors"><i class="fas fa-plus-circle w-6 text-center text-blue-500"></i> Add Asset</button>
+                    <div class="border-t border-gray-100 my-2"></div>
+                    <button onclick="logout(); toggleMobileMenu()" class="text-left px-4 py-3 rounded-lg hover:bg-red-50 active:bg-red-100 text-red-600 font-medium transition-colors"><i class="fas fa-sign-out-alt w-6 text-center"></i> Logout</button>
                 </nav>
             </div>
 
             <!-- Scrollable Content Container -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 w-full">
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 w-full pb-20 md:pb-8">
                 
                 <!-- VIEW 1: DASHBOARD -->
                 <div id="view-dashboard" class="max-w-7xl mx-auto space-y-6 fade-in">
-                    <div class="flex justify-between items-end">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
                             <p class="text-gray-500 text-sm mt-1">Summary of your tracked assets</p>
                         </div>
-                        <button onclick="fetchData()" class="text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm font-medium transition border border-blue-200 bg-white shadow-sm flex items-center gap-2">
-                            <i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Refresh</span>
+                        <button onclick="fetchData()" class="w-full sm:w-auto text-blue-600 hover:bg-blue-50 px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg text-sm font-medium transition border border-blue-200 bg-white shadow-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-sync-alt"></i> <span>Refresh Data</span>
                         </button>
                     </div>
 
                     <!-- Summary Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-6 flex items-center justify-between hover:shadow-md transition-shadow">
                             <div>
                                 <p class="text-sm font-medium text-gray-500 mb-1">Total Assets</p>
                                 <p id="stat-total" class="text-3xl font-bold text-gray-800">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
                                 <i class="fas fa-boxes"></i>
                             </div>
                         </div>
 
-                        <div onclick="filterAssets('service')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between cursor-pointer hover:border-yellow-300 hover:shadow-md transition-all group">
+                        <div onclick="filterAssets('service')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:border-yellow-300 hover:shadow-md transition-all group">
                             <div>
                                 <p class="text-sm font-medium text-gray-500 mb-1 group-hover:text-yellow-600 transition-colors">Service Due (30 Days)</p>
                                 <p id="stat-service" class="text-3xl font-bold text-gray-800">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-lg flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
                                 <i class="fas fa-tools"></i>
                             </div>
                         </div>
 
-                        <div onclick="filterAssets('warranty')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between cursor-pointer hover:border-red-300 hover:shadow-md transition-all group">
+                        <div onclick="filterAssets('warranty')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:border-red-300 hover:shadow-md transition-all group sm:col-span-2 md:col-span-1">
                             <div>
                                 <p class="text-sm font-medium text-gray-500 mb-1 group-hover:text-red-600 transition-colors">Warranty Ending (30 Days)</p>
                                 <p id="stat-warranty" class="text-3xl font-bold text-gray-800">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-red-50 text-red-500 rounded-lg flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 bg-red-50 text-red-500 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
                         </div>
@@ -184,32 +184,32 @@
                 </div>
 
                 <!-- VIEW 2: ASSET LIST -->
-                <div id="view-assets" class="hidden max-w-7xl mx-auto space-y-6 fade-in h-full flex flex-col">
+                <div id="view-assets" class="hidden max-w-7xl mx-auto space-y-4 sm:space-y-6 fade-in h-full flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800">Asset Directory</h2>
                             <p id="list-subtitle" class="text-gray-500 text-sm mt-1">Showing all active assets</p>
                         </div>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button id="clear-filter-btn" onclick="clearFilters()" class="hidden bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                            <button id="clear-filter-btn" onclick="clearFilters()" class="hidden w-full sm:w-auto bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors text-center">
                                 Clear Filters
                             </button>
-                            <button onclick="switchView('add')" class="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
-                                <i class="fas fa-plus"></i> Add New
+                            <button onclick="switchView('add')" class="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
+                                <i class="fas fa-plus"></i> Add New Asset
                             </button>
                         </div>
                     </div>
 
-                    <!-- Table Container -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
-                        <div class="overflow-x-auto">
+                    <!-- Table Container (Responsive Horizontal Scroll) -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 flex flex-col overflow-hidden w-full">
+                        <div class="overflow-x-auto w-full">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Info</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates & Status</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service Provider</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Docs</th>
+                                        <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Asset Info</th>
+                                        <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Dates & Status</th>
+                                        <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Service Provider</th>
+                                        <th scope="col" class="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Docs</th>
                                     </tr>
                                 </thead>
                                 <tbody id="asset-table-body" class="bg-white divide-y divide-gray-200">
@@ -217,39 +217,40 @@
                                 </tbody>
                             </table>
                         </div>
+                        
                         <!-- Empty State -->
-                        <div id="empty-state" class="hidden flex-col items-center justify-center py-12 text-center">
+                        <div id="empty-state" class="hidden flex-col items-center justify-center py-12 px-4 text-center">
                             <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                 <i class="fas fa-folder-open text-gray-400 text-2xl"></i>
                             </div>
                             <h3 class="text-lg font-medium text-gray-900">No assets found</h3>
-                            <p class="text-gray-500 mt-1 max-w-sm mx-auto">Get started by adding your first piece of equipment to the system.</p>
-                            <button onclick="switchView('add')" class="mt-4 text-blue-600 font-medium hover:text-blue-800">Add Asset &rarr;</button>
+                            <p class="text-gray-500 mt-1 max-w-sm mx-auto text-sm">Get started by adding your first piece of equipment to the system.</p>
+                            <button onclick="switchView('add')" class="mt-4 text-blue-600 font-medium hover:text-blue-800 text-sm">Add Asset &rarr;</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- VIEW 3: ADD ASSET FORM -->
-                <div id="view-add" class="hidden max-w-4xl mx-auto fade-in pb-10">
-                    <div class="mb-6">
+                <div id="view-add" class="hidden max-w-4xl mx-auto fade-in">
+                    <div class="mb-4 sm:mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">Register New Asset</h2>
                         <p class="text-gray-500 text-sm mt-1">Fill out the details below to track a new piece of equipment.</p>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-                        <form id="add-asset-form" class="space-y-8">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
+                        <form id="add-asset-form" class="space-y-6 sm:space-y-8">
                             
                             <!-- Basic Info Section -->
                             <div>
                                 <h3 class="text-lg font-semibold border-b pb-2 mb-4 text-gray-700">Basic Information</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     <div class="col-span-1 md:col-span-2">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Asset Name / Model <span class="text-red-500">*</span></label>
-                                        <input type="text" id="assetName" required placeholder="e.g., Dell XPS 15 Laptop" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                        <input type="text" id="assetName" required placeholder="e.g., Dell XPS 15 Laptop" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Registered Contact Number</label>
-                                        <input type="tel" id="regContact" placeholder="e.g., 9876543210" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                        <input type="tel" id="regContact" placeholder="e.g., 9876543210" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -257,40 +258,48 @@
                             <!-- Document Uploads -->
                             <div>
                                 <h3 class="text-lg font-semibold border-b pb-2 mb-4 text-gray-700">Documents</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     
                                     <!-- Photo Upload Dropzone -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Upload Photo</label>
-                                        <div id="photo-dropzone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 relative min-h-[140px] items-center">
+                                        <div id="photo-dropzone" class="mt-1 flex justify-center px-4 sm:px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 relative min-h-[140px] items-center transition-colors">
+                                            
+                                            <!-- Initial State -->
                                             <div id="photo-initial-state" class="space-y-1 text-center w-full">
                                                 <i class="fas fa-camera text-gray-400 text-3xl mb-2 hover:text-blue-500 transition-colors"></i>
                                                 <div class="flex text-sm text-gray-600 justify-center">
-                                                    <label for="photo-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                                                    <label for="photo-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none p-1 sm:p-0">
                                                         <span>Select an image</span>
                                                         <input id="photo-upload" type="file" class="sr-only" accept="image/*">
                                                     </label>
                                                 </div>
-                                                <p class="text-xs text-gray-500">PNG, JPG up to 2MB</p>
+                                                <p class="text-xs text-gray-500 mt-1">PNG, JPG up to 2MB</p>
                                             </div>
 
+                                            <!-- Processing State -->
                                             <div id="photo-processing-state" class="hidden w-full space-y-3 text-center py-2 fade-in">
-                                                <div class="flex justify-center mb-1"><i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i></div>
+                                                <div class="flex justify-center mb-1">
+                                                    <i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i>
+                                                </div>
                                                 <p class="text-xs font-medium text-gray-600">Preparing file...</p>
                                                 <div class="w-3/4 mx-auto bg-gray-200 rounded-full h-1.5 overflow-hidden">
                                                     <div class="bg-blue-600 h-1.5 rounded-full w-full animate-pulse origin-left scale-x-[0.3] duration-1000 ease-in-out transition-transform"></div>
                                                 </div>
                                             </div>
 
-                                            <div id="photo-preview-state" class="hidden w-full flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 shadow-sm fade-in">
-                                                <div class="flex items-center gap-3 overflow-hidden">
+                                            <!-- Preview State -->
+                                            <div id="photo-preview-state" class="hidden w-full flex flex-col sm:flex-row items-center justify-between bg-white p-3 rounded-lg border border-gray-200 shadow-sm fade-in gap-3">
+                                                <div class="flex items-center gap-3 overflow-hidden w-full">
                                                     <img id="photo-thumbnail" src="" alt="Preview" class="w-12 h-12 object-cover rounded border border-gray-100 flex-shrink-0">
-                                                    <div class="text-left min-w-0">
+                                                    <div class="text-left min-w-0 flex-1">
                                                         <p id="photo-file-name-display" class="text-sm font-semibold text-gray-800 truncate"></p>
                                                         <p class="text-[10px] text-green-600 font-bold uppercase tracking-wider mt-0.5"><i class="fas fa-check-circle"></i> Ready</p>
                                                     </div>
                                                 </div>
-                                                <button type="button" onclick="removePhoto()" class="text-gray-400 hover:text-red-500 p-2 focus:outline-none transition-colors flex-shrink-0" title="Remove Photo"><i class="fas fa-trash-alt text-lg"></i></button>
+                                                <button type="button" onclick="removePhoto()" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 sm:p-1.5 rounded-md focus:outline-none transition-colors flex-shrink-0 w-full sm:w-auto flex justify-center items-center gap-2" title="Remove Photo">
+                                                    <i class="fas fa-trash-alt text-base sm:text-lg"></i> <span class="sm:hidden text-sm font-medium">Remove</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -298,59 +307,68 @@
                                     <!-- Bill Upload Dropzone -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Upload Bill / Invoice</label>
-                                        <div id="bill-dropzone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 relative min-h-[140px] items-center">
+                                        <div id="bill-dropzone" class="mt-1 flex justify-center px-4 sm:px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 relative min-h-[140px] items-center transition-colors">
+                                            
+                                            <!-- Initial State -->
                                             <div id="bill-initial-state" class="space-y-1 text-center w-full">
                                                 <i class="fas fa-file-invoice text-gray-400 text-3xl mb-2 hover:text-blue-500 transition-colors"></i>
                                                 <div class="flex text-sm text-gray-600 justify-center">
-                                                    <label for="bill-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                                                    <label for="bill-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none p-1 sm:p-0">
                                                         <span>Select a file</span>
                                                         <input id="bill-upload" type="file" class="sr-only" accept="application/pdf,image/*">
                                                     </label>
                                                 </div>
-                                                <p class="text-xs text-gray-500">PDF, PNG, JPG up to 2MB</p>
+                                                <p class="text-xs text-gray-500 mt-1">PDF, PNG, JPG up to 2MB</p>
                                             </div>
 
+                                            <!-- Processing State -->
                                             <div id="bill-processing-state" class="hidden w-full space-y-3 text-center py-2 fade-in">
-                                                <div class="flex justify-center mb-1"><i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i></div>
+                                                <div class="flex justify-center mb-1">
+                                                    <i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i>
+                                                </div>
                                                 <p class="text-xs font-medium text-gray-600">Preparing file...</p>
                                                 <div class="w-3/4 mx-auto bg-gray-200 rounded-full h-1.5 overflow-hidden">
                                                     <div class="bg-blue-600 h-1.5 rounded-full w-full animate-pulse origin-left scale-x-[0.3] duration-1000 ease-in-out transition-transform"></div>
                                                 </div>
                                             </div>
 
-                                            <div id="bill-preview-state" class="hidden w-full flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 shadow-sm fade-in">
-                                                <div class="flex items-center gap-3 overflow-hidden">
+                                            <!-- Preview State -->
+                                            <div id="bill-preview-state" class="hidden w-full flex flex-col sm:flex-row items-center justify-between bg-white p-3 rounded-lg border border-gray-200 shadow-sm fade-in gap-3">
+                                                <div class="flex items-center gap-3 overflow-hidden w-full">
                                                     <img id="bill-thumbnail" src="" alt="Preview" class="w-12 h-12 object-cover rounded border border-gray-100 hidden flex-shrink-0">
                                                     <div id="bill-doc-icon" class="w-12 h-12 bg-blue-50 text-blue-500 rounded border border-blue-100 flex items-center justify-center text-xl flex-shrink-0 hidden">
                                                         <i class="fas fa-file-pdf"></i>
                                                     </div>
-                                                    <div class="text-left min-w-0">
+                                                    <div class="text-left min-w-0 flex-1">
                                                         <p id="bill-file-name-display" class="text-sm font-semibold text-gray-800 truncate"></p>
                                                         <p class="text-[10px] text-green-600 font-bold uppercase tracking-wider mt-0.5"><i class="fas fa-check-circle"></i> Ready</p>
                                                     </div>
                                                 </div>
-                                                <button type="button" onclick="removeBill()" class="text-gray-400 hover:text-red-500 p-2 focus:outline-none transition-colors flex-shrink-0" title="Remove Bill"><i class="fas fa-trash-alt text-lg"></i></button>
+                                                <button type="button" onclick="removeBill()" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 sm:p-1.5 rounded-md focus:outline-none transition-colors flex-shrink-0 w-full sm:w-auto flex justify-center items-center gap-2" title="Remove Bill">
+                                                    <i class="fas fa-trash-alt text-base sm:text-lg"></i> <span class="sm:hidden text-sm font-medium">Remove</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
 
                             <!-- Dates & Deadlines -->
                             <div>
                                 <h3 class="text-lg font-semibold border-b pb-2 mb-4 text-gray-700">Deadlines</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Date <span class="text-red-500">*</span></label>
-                                        <input type="date" id="purchaseDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-600">
+                                        <input type="date" id="purchaseDate" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 text-sm">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Warranty End Date</label>
-                                        <input type="date" id="warrantyDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-600">
+                                        <input type="date" id="warrantyDate" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 text-sm">
                                     </div>
-                                    <div>
+                                    <div class="sm:col-span-2 md:col-span-1">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Next Service Due <span class="text-red-500">*</span></label>
-                                        <input type="date" id="serviceDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-600">
+                                        <input type="date" id="serviceDate" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -358,26 +376,28 @@
                             <!-- Service Provider Details -->
                             <div>
                                 <h3 class="text-lg font-semibold border-b pb-2 mb-4 text-gray-700">Service Provider Details</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Provider Name</label>
-                                        <input type="text" id="spName" placeholder="e.g., ABC Electronics Repair" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <input type="text" id="spName" placeholder="e.g., ABC Electronics Repair" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                                        <input type="tel" id="spContact" placeholder="e.g., 1800-123-456" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <input type="tel" id="spContact" placeholder="e.g., 1800-123-456" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                                     </div>
                                     <div class="col-span-1 md:col-span-2">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
-                                        <textarea id="spAddress" rows="2" placeholder="e.g., 123 Tech Lane, City" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                                        <textarea id="spAddress" rows="2" placeholder="e.g., 123 Tech Lane, City" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none text-sm"></textarea>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Actions -->
-                            <div class="flex justify-end gap-3 pt-4 border-t">
-                                <button type="button" onclick="switchView('assets')" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">Cancel</button>
-                                <button type="submit" class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-md transition-colors flex items-center gap-2"><i class="fas fa-save"></i> Save Asset</button>
+                            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-100">
+                                <button type="button" onclick="switchView('assets')" class="w-full sm:w-auto px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors order-2 sm:order-1">Cancel</button>
+                                <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-md transition-colors flex items-center justify-center gap-2 order-1 sm:order-2">
+                                    <i class="fas fa-save"></i> Save Asset
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -387,46 +407,48 @@
     </div>
 
     <!-- DOCUMENT PREVIEW MODAL -->
-    <div id="doc-modal" class="fixed inset-0 z-[60] hidden modal-open flex items-center justify-center p-4 sm:p-6">
+    <div id="doc-modal" class="fixed inset-0 z-[60] hidden modal-open flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
         <div class="modal-overlay absolute inset-0" onclick="closeDocModal()"></div>
         
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative z-10 modal-content overflow-hidden">
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl h-[95vh] sm:max-h-[90vh] flex flex-col relative z-10 modal-content overflow-hidden">
             <!-- Header -->
-            <div class="flex items-center justify-between p-4 border-b bg-gray-50">
-                <h3 class="text-xl font-bold text-gray-800" id="modal-asset-name">Asset Documents</h3>
-                <button onclick="closeDocModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-md hover:bg-gray-200 transition-colors">
-                    <i class="fas fa-times text-xl"></i>
+            <div class="flex items-center justify-between p-3 sm:p-4 border-b bg-gray-50 flex-shrink-0">
+                <h3 class="text-lg sm:text-xl font-bold text-gray-800 truncate pr-2" id="modal-asset-name">Asset Documents</h3>
+                <button onclick="closeDocModal()" class="text-gray-500 hover:text-red-500 bg-white border border-gray-200 hover:bg-red-50 focus:outline-none w-8 h-8 sm:w-10 sm:h-10 rounded-md transition-colors flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <i class="fas fa-times sm:text-xl"></i>
                 </button>
             </div>
             
             <!-- Modal Body -->
-            <div class="flex-1 flex flex-col min-h-0 bg-gray-100 p-4">
-                <div class="flex space-x-2 mb-4 bg-white p-1 rounded-lg shadow-sm border border-gray-200 self-center">
-                    <button id="tab-photo" onclick="switchDocTab('photo')" class="px-6 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2 text-gray-500 hover:text-gray-700">
+            <div class="flex-1 flex flex-col min-h-0 bg-gray-100 p-2 sm:p-4 overflow-hidden">
+                
+                <!-- Tab Controls -->
+                <div class="flex space-x-1 sm:space-x-2 mb-2 sm:mb-4 bg-white p-1 rounded-lg shadow-sm border border-gray-200 self-stretch sm:self-center overflow-x-auto hide-scrollbar flex-shrink-0">
+                    <button id="tab-photo" onclick="switchDocTab('photo')" class="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1 sm:gap-2 text-gray-500 hover:text-gray-700 whitespace-nowrap">
                         <i class="fas fa-image"></i> Product Photo
                     </button>
-                    <button id="tab-bill" onclick="switchDocTab('bill')" class="px-6 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2 text-gray-500 hover:text-gray-700">
+                    <button id="tab-bill" onclick="switchDocTab('bill')" class="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1 sm:gap-2 text-gray-500 hover:text-gray-700 whitespace-nowrap">
                         <i class="fas fa-file-invoice"></i> Bill / Invoice
                     </button>
                 </div>
 
-                <div class="flex-1 bg-white rounded-xl border border-gray-200 shadow-inner overflow-hidden relative flex items-center justify-center min-h-[300px]">
+                <!-- Document Display Area -->
+                <div class="flex-1 bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-inner overflow-hidden relative flex items-center justify-center">
                     <div id="modal-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 hidden">
-                        <i class="fas fa-circle-notch fa-spin text-blue-500 text-4xl mb-3"></i>
-                        <span class="text-gray-500 font-medium">Loading Document...</span>
+                        <i class="fas fa-circle-notch fa-spin text-blue-500 text-3xl sm:text-4xl mb-3"></i>
+                        <span class="text-gray-500 font-medium text-sm">Loading Document...</span>
                     </div>
                     
-                    <div id="modal-content-area" class="w-full h-full flex items-center justify-center p-4">
+                    <div id="modal-content-area" class="w-full h-full flex items-center justify-center p-2 sm:p-4 overflow-auto">
                         <div class="text-center text-gray-400">
-                            <i class="fas fa-file-alt text-5xl mb-2"></i>
-                            <p>Select a tab above to view document</p>
+                            <i class="fas fa-file-alt text-4xl sm:text-5xl mb-2"></i>
+                            <p class="text-sm sm:text-base">Select a tab above to view document</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -436,9 +458,8 @@
         let appData = [];
         let isAuthenticated = false;
         let currentModalAsset = null;
-        let pendingPhotoBase64 = '';
-        let pendingBillBase64 = '';
 
+        // UI Helpers
         function showLoading(message = "Data Loading or Updating...") {
             document.getElementById('loader-text').innerText = message;
             document.getElementById('global-loader').classList.remove('hidden');
@@ -449,12 +470,19 @@
         }
 
         function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            const btn = document.getElementById('mobile-menu-btn');
+            if(menu.classList.contains('hidden')){
+                btn.classList.remove('bg-gray-100');
+            } else {
+                btn.classList.add('bg-gray-100');
+            }
         }
 
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
-            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white font-medium z-50 fade-in flex items-center gap-2 ${
+            toast.className = `fixed bottom-4 left-4 right-4 sm:left-auto sm:w-auto sm:right-4 px-4 sm:px-6 py-3 rounded-lg shadow-xl text-white text-sm sm:text-base font-medium z-[100] fade-in flex items-center gap-2 ${
                 type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-blue-600'
             }`;
             toast.innerHTML = `<i class="fas ${type==='error'?'fa-exclamation-circle':type==='success'?'fa-check-circle':'fa-info-circle'}"></i> ${message}`;
@@ -497,8 +525,8 @@
                 
                 const result = await response.json();
                 
-                // Better success check
-                if (result.success || result.status === 'success') {
+                // Fixed: explicitly check for 'success' or success status
+                if (result.success === true || result.status === 'success') {
                     isAuthenticated = true;
                     document.getElementById('login-view').classList.add('hidden');
                     document.getElementById('app-view').classList.remove('hidden');
@@ -516,7 +544,7 @@
                 console.error("Login Error:", error);
                 hideLoading();
                 errorDiv.classList.remove('hidden');
-                errorDiv.querySelector('p').innerText = "Network Error. Please try again.";
+                errorDiv.querySelector('p').innerText = "Network Error. Please check your connection.";
             }
         });
 
@@ -531,25 +559,25 @@
             document.getElementById('login-view').classList.add('fade-in');
         }
 
-        // DATA FETCHING
+        // DATA FETCHING & LOGIC
         async function fetchData() {
             showLoading("Data Loading or Updating...");
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getAssets`);
                 const result = await response.json();
                 
-                if (result.success || result.status === 'success') {
+                if (result.success === true || result.status === 'success') {
                     appData = result.data;
                     updateDashboard();
                     if(!document.getElementById('view-assets').classList.contains('hidden')) {
                         renderTable(appData);
                     }
                 } else {
-                    showToast("Failed to load data", "error");
+                    showToast("Failed to load data from server", "error");
                 }
             } catch (error) {
                 console.error("Fetch error:", error);
-                showToast("Connection error", "error");
+                showToast("Connection error while loading data", "error");
             } finally {
                 hideLoading();
             }
@@ -636,58 +664,64 @@
 
             data.forEach(asset => {
                 const serviceStatus = getStatus(asset.serviceDate);
-                const hasDocs = (asset.photoData && asset.photoData.length > 5) || (asset.billData && asset.billData.length > 5);
+                const hasDocs = (asset.photoData && asset.photoData.length > 5 && !asset.photoData.startsWith('ERROR')) || 
+                                (asset.billData && asset.billData.length > 5 && !asset.billData.startsWith('ERROR'));
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors';
+                
+                // FIXED: Adjusted padding and text sizes for mobile-friendliness. Allowed address to wrap.
                 tr.innerHTML = `
-                    <td class="px-6 py-4">
+                    <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i class="fas fa-laptop"></i></div>
-                            <div class="ml-4">
+                            <div class="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-sm sm:text-base"><i class="fas fa-laptop"></i></div>
+                            <div class="ml-3 sm:ml-4">
                                 <div class="text-sm font-medium text-gray-900">${asset.name}</div>
-                                <div class="text-xs text-gray-500 mt-0.5">Purchased: ${formatDate(asset.purchaseDate)}</div>
+                                <div class="text-[11px] sm:text-xs text-gray-500 mt-0.5">Purchased: ${formatDate(asset.purchaseDate)}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="text-xs text-gray-600 mb-1 flex items-center justify-between w-32">
+                    <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                        <div class="text-[11px] sm:text-xs text-gray-600 mb-1 flex items-center justify-between w-28 sm:w-32">
                             <span>Warranty:</span> <span class="font-medium">${formatDate(asset.warrantyDate)}</span>
                         </div>
-                        <div class="text-xs text-gray-600 flex items-center justify-between w-32">
+                        <div class="text-[11px] sm:text-xs text-gray-600 flex items-center justify-between w-28 sm:w-32">
                             <span>Service:</span>
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${serviceStatus.color}">
+                            <span class="px-2 inline-flex text-[10px] sm:text-xs leading-4 sm:leading-5 font-semibold rounded-full ${serviceStatus.color}">
                                 ${formatDate(asset.serviceDate)}
                             </span>
                         </div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="text-base font-bold text-gray-800">${asset.spName || '-'}</div>
-                        <div class="text-sm text-gray-700 mt-1 flex items-center gap-1.5">
-                            <i class="fas fa-phone-alt text-gray-400 text-xs"></i> ${asset.spContact || '-'}
+                    <td class="px-4 sm:px-6 py-3 sm:py-4 min-w-[200px]">
+                        <div class="text-sm sm:text-base font-bold text-gray-800">${asset.spName || '-'}</div>
+                        <div class="text-xs sm:text-sm text-gray-700 mt-0.5 sm:mt-1 flex items-center gap-1.5">
+                            <i class="fas fa-phone-alt text-gray-400 text-[10px] sm:text-xs"></i> ${asset.spContact || '-'}
                         </div>
-                        <div class="text-sm text-gray-500 mt-1 flex items-start gap-1.5 whitespace-normal min-w-[150px] max-w-[250px]">
-                            <i class="fas fa-map-marker-alt text-gray-400 text-xs mt-1"></i> <span>${asset.spAddress || '-'}</span>
+                        <div class="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1 flex items-start gap-1.5 max-w-[200px] sm:max-w-[250px] whitespace-normal">
+                            <i class="fas fa-map-marker-alt text-gray-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex-shrink-0"></i> <span>${asset.spAddress || '-'}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${hasDocs ? `<button onclick='openDocModal(${JSON.stringify(asset).replace(/'/g, "&#39;")})' class="text-blue-600 bg-blue-50 hover:bg-blue-100 p-2 rounded-md transition-colors"><i class="fas fa-file-alt"></i> View Docs</button>` : `<span class="text-gray-400 text-xs bg-gray-50 px-2 py-1 rounded">No docs</span>`}
+                    <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                        ${hasDocs ? `<button onclick='openDocModal(${JSON.stringify(asset).replace(/'/g, "&#39;")})' class="text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 sm:p-2 rounded-md transition-colors text-xs sm:text-sm shadow-sm border border-blue-100"><i class="fas fa-folder-open mr-1"></i> View</button>` : `<span class="text-gray-400 text-[10px] sm:text-xs bg-gray-50 px-2 py-1 rounded border border-gray-100">No docs</span>`}
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // MODAL LOGIC
+        // MODAL LOGIC FOR DRIVE PREVIEWS
         function openDocModal(asset) {
             currentModalAsset = asset;
-            document.getElementById('modal-asset-name').innerText = asset.name + " Docs";
+            document.getElementById('modal-asset-name').innerText = asset.name;
             document.getElementById('doc-modal').classList.remove('hidden');
             
-            if(asset.photoData && asset.photoData.length > 5) {
-                switchDocTab('photo');
-            } else if (asset.billData && asset.billData.length > 5) {
-                switchDocTab('bill');
+            const hasPhoto = asset.photoData && asset.photoData.length > 5 && !asset.photoData.startsWith('ERROR');
+            const hasBill = asset.billData && asset.billData.length > 5 && !asset.billData.startsWith('ERROR');
+
+            if(hasPhoto) switchDocTab('photo');
+            else if (hasBill) switchDocTab('bill');
+            else {
+                document.getElementById('modal-content-area').innerHTML = `<div class="text-center text-gray-400"><i class="fas fa-ban text-4xl mb-2"></i><p>No valid document available.</p></div>`;
             }
         }
 
@@ -699,35 +733,44 @@
 
         function switchDocTab(type) {
             if(!currentModalAsset) return;
+
+            // Styling Tabs
+            document.getElementById('tab-photo').className = "flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap " + (type === 'photo' ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100" : "text-gray-500 hover:text-gray-700 bg-transparent border border-transparent");
             
-            document.getElementById('tab-photo').className = "px-6 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2 " + (type === 'photo' ? "bg-blue-50 text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700");
-            document.getElementById('tab-bill').className = "px-6 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2 " + (type === 'bill' ? "bg-blue-50 text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700");
+            document.getElementById('tab-bill').className = "flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap " + (type === 'bill' ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100" : "text-gray-500 hover:text-gray-700 bg-transparent border border-transparent");
 
             const contentArea = document.getElementById('modal-content-area');
             const loader = document.getElementById('modal-loader');
             let url = type === 'photo' ? currentModalAsset.photoData : currentModalAsset.billData;
 
             if(!url || url.length < 5 || url.startsWith('ERROR')) {
-                contentArea.innerHTML = `<div class="text-center text-gray-400"><i class="fas fa-ban text-4xl mb-2"></i><p>No valid document found or upload failed.</p></div>`;
+                contentArea.innerHTML = `<div class="text-center text-gray-400"><i class="fas fa-ban text-3xl sm:text-4xl mb-2"></i><p class="text-sm sm:text-base">Document not available</p></div>`;
                 return;
             }
 
             contentArea.innerHTML = '';
             loader.classList.remove('hidden');
 
-            if(url.startsWith('data:image')) {
-                loader.classList.add('hidden');
-                contentArea.innerHTML = `<img src="${url}" class="max-w-full max-h-[60vh] object-contain rounded shadow" />`;
-            } else {
-                const iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.className = "w-full h-[60vh] rounded border-0";
-                iframe.onload = () => loader.classList.add('hidden');
-                contentArea.appendChild(iframe);
-            }
+            // Embed Google Drive Link
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.className = "w-full h-full rounded border-0 bg-gray-50 min-h-[300px] sm:min-h-[500px]";
+            iframe.setAttribute('allow', 'autoplay');
+            iframe.onload = () => loader.classList.add('hidden');
+            
+            // Handle iframe errors via timeout just in case it's blocked
+            setTimeout(() => loader.classList.add('hidden'), 3000); 
+
+            contentArea.appendChild(iframe);
         }
 
-        // FILE PROCESSING & FORM SAVING
+        // --- FORM HANDLING & BASE64 CONVERSION ---
+        
+        // Hold base64 strings in memory for lightning fast submission
+        let pendingPhotoBase64 = '';
+        let pendingBillBase64 = '';
+
+        // Helper to convert File to Base64 String
         function getBase64(file) {
             return new Promise((resolve, reject) => {
                 if(!file) { resolve(''); return; }
@@ -738,72 +781,124 @@
             });
         }
 
+        // Photo Upload Event Logic
         document.getElementById('photo-upload').addEventListener('change', async function(e) {
             const file = this.files[0];
             if (!file) return;
-            if(file.size > 2 * 1024 * 1024) return alert("File is too large. Please select an image under 2MB.");
-            
+
+            if(file.size > 2 * 1024 * 1024) {
+                alert("File is too large. Please select an image under 2MB.");
+                this.value = '';
+                return;
+            }
+
+            // Show Processing State
             document.getElementById('photo-initial-state').classList.add('hidden');
             document.getElementById('photo-processing-state').classList.remove('hidden');
+
             try {
+                // Process the file to base64 immediately for preview & fast submission
                 pendingPhotoBase64 = await getBase64(file);
-                await new Promise(r => setTimeout(r, 600)); // UI effect
+                
+                // Simulate brief visual loading bar for UX
+                await new Promise(r => setTimeout(r, 600));
+                
                 document.getElementById('photo-thumbnail').src = pendingPhotoBase64;
                 document.getElementById('photo-file-name-display').textContent = file.name;
+                
+                // Show Preview State
                 document.getElementById('photo-processing-state').classList.add('hidden');
                 document.getElementById('photo-preview-state').classList.remove('hidden');
+                document.getElementById('photo-preview-state').classList.add('flex');
                 document.getElementById('photo-dropzone').classList.remove('border-dashed', 'bg-gray-50');
                 document.getElementById('photo-dropzone').classList.add('bg-white');
-            } catch(err) { showToast("Error processing photo", "error"); removePhoto(); }
+            } catch(err) {
+                console.error(err);
+                showToast("Error reading image file", "error");
+                removePhoto();
+            }
         });
 
+        // Remove Photo Logic
         function removePhoto() {
             document.getElementById('photo-upload').value = '';
             pendingPhotoBase64 = '';
             document.getElementById('photo-preview-state').classList.add('hidden');
+            document.getElementById('photo-preview-state').classList.remove('flex');
             document.getElementById('photo-initial-state').classList.remove('hidden');
             document.getElementById('photo-dropzone').classList.add('border-dashed', 'bg-gray-50');
             document.getElementById('photo-dropzone').classList.remove('bg-white');
         }
 
+        // Bill Upload Event Logic
         document.getElementById('bill-upload').addEventListener('change', async function(e) {
             const file = this.files[0];
             if (!file) return;
-            if(file.size > 2 * 1024 * 1024) return alert("File is too large. Please select a file under 2MB.");
-            
+
+            if(file.size > 2 * 1024 * 1024) {
+                alert("File is too large. Please select a file under 2MB.");
+                this.value = '';
+                return;
+            }
+
+            // Show Processing State
             document.getElementById('bill-initial-state').classList.add('hidden');
             document.getElementById('bill-processing-state').classList.remove('hidden');
+
             try {
+                // Process the file to base64 immediately
                 pendingBillBase64 = await getBase64(file);
-                await new Promise(r => setTimeout(r, 600)); // UI effect
+                
+                // Simulate brief visual loading bar for UX
+                await new Promise(r => setTimeout(r, 600));
+                
+                // Show a generic document icon for PDFs, or thumbnail for images
                 const thumbnail = document.getElementById('bill-thumbnail');
                 const docIcon = document.getElementById('bill-doc-icon');
+                
                 if (file.type.startsWith('image/')) {
-                    thumbnail.src = pendingBillBase64; thumbnail.classList.remove('hidden'); docIcon.classList.add('hidden');
+                    thumbnail.src = pendingBillBase64;
+                    thumbnail.classList.remove('hidden');
+                    docIcon.classList.add('hidden');
                 } else {
-                    thumbnail.classList.add('hidden'); docIcon.classList.remove('hidden');
+                    thumbnail.classList.add('hidden');
+                    docIcon.classList.remove('hidden');
                 }
+
                 document.getElementById('bill-file-name-display').textContent = file.name;
+                
+                // Show Preview State
                 document.getElementById('bill-processing-state').classList.add('hidden');
                 document.getElementById('bill-preview-state').classList.remove('hidden');
+                document.getElementById('bill-preview-state').classList.add('flex');
                 document.getElementById('bill-dropzone').classList.remove('border-dashed', 'bg-gray-50');
                 document.getElementById('bill-dropzone').classList.add('bg-white');
-            } catch(err) { showToast("Error processing bill", "error"); removeBill(); }
+            } catch(err) {
+                console.error(err);
+                showToast("Error reading bill file", "error");
+                removeBill();
+            }
         });
 
+        // Remove Bill Logic
         function removeBill() {
             document.getElementById('bill-upload').value = '';
             pendingBillBase64 = '';
             document.getElementById('bill-preview-state').classList.add('hidden');
+            document.getElementById('bill-preview-state').classList.remove('flex');
             document.getElementById('bill-initial-state').classList.remove('hidden');
             document.getElementById('bill-dropzone').classList.add('border-dashed', 'bg-gray-50');
             document.getElementById('bill-dropzone').classList.remove('bg-white');
         }
 
+        // Submitting the Form
         document.getElementById('add-asset-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            showLoading("Saving Asset Data & Uploading Files...");
+            
+            showLoading("Data Loading or Updating...");
+            
             try {
+                // Gather data (base64 strings are already prepared, making this fast)
                 const newAsset = {
                     name: document.getElementById('assetName').value,
                     purchaseDate: document.getElementById('purchaseDate').value,
@@ -824,18 +919,20 @@
                 
                 const result = await response.json();
                 
-                if (result.success || result.status === 'success') {
+                // Explicit success check
+                if (result.success === true || result.status === 'success') {
                     showToast("Asset saved successfully!", "success");
                     e.target.reset();
                     removePhoto();
                     removeBill();
-                    fetchData(); 
+                    fetchData(); // Refresh the data to show the new item
                     switchView('assets');
                 } else {
-                    showToast("Error saving data: " + result.message, "error");
+                    showToast("Server Error: " + (result.message || "Could not save"), "error");
                 }
+                
             } catch (error) {
-                console.error("Error saving form:", error);
+                console.error("Error processing form:", error);
                 showToast("Network Error during save", "error");
             } finally {
                 hideLoading();
