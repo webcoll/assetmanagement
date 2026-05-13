@@ -489,6 +489,21 @@
         .doc-btn:hover { background: var(--accent); color: #fff; transform: scale(1.03); }
         .no-doc { font-size: 12px; color: rgba(10,10,18,0.3); }
 
+        /* ── Advanced Table Headers ── */
+        .th-content { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; user-select: none; transition: color 0.2s; }
+        .th-content:hover { color: var(--accent); }
+        .filter-row th { padding: 8px 20px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+        .filter-input-sm { width: 100%; padding: 8px 10px; font-size: 12px; font-weight: 400; border: 1px solid var(--border); border-radius: 6px; background: var(--white); color: var(--ink); outline: none; transition: border-color 0.2s; font-family: 'DM Sans', sans-serif; }
+        .filter-input-sm:focus { border-color: var(--accent); }
+        .filter-input-sm::placeholder { color: rgba(10,10,18,0.3); }
+        .sort-icon { opacity: 0.3; transition: all 0.2s; font-size: 12px; }
+        .sort-icon.active { opacity: 1; color: var(--accent); }
+
+        /* ── SP Blocks ── */
+        .sp-block { position: relative; padding: 20px; border: 1px dashed var(--border); border-radius: var(--radius-sm); margin-bottom: 16px; background: var(--surface-2); }
+        .sp-remove { position: absolute; top: -10px; right: -10px; background: var(--white); border: 1px solid var(--border); color: var(--danger); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); z-index: 10; }
+        .sp-remove:hover { background: var(--danger-soft); }
+
         /* Empty State */
         .empty-state { padding: 64px 24px; text-align: center; display: none; flex-direction: column; align-items: center; }
         .empty-state.show { display: flex; }
@@ -866,11 +881,20 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Asset</th>
-                                    <th>Warranty</th>
-                                    <th>Next Service</th>
-                                    <th>Service Provider</th>
-                                    <th>Documents</th>
+                                    <th onclick="sortTable('name')"><div class="th-content">ASSET <i class="fas fa-sort sort-icon" id="sort-name"></i></div></th>
+                                    <th onclick="sortTable('assignedName')"><div class="th-content">ASSIGNED TO <i class="fas fa-sort sort-icon" id="sort-assignedName"></i></div></th>
+                                    <th onclick="sortTable('warrantyStatus')"><div class="th-content">WARRANTY <i class="fas fa-sort sort-icon" id="sort-warrantyStatus"></i></div></th>
+                                    <th onclick="sortTable('serviceStatus')"><div class="th-content">NEXT SERVICE <i class="fas fa-sort sort-icon" id="sort-serviceStatus"></i></div></th>
+                                    <th onclick="sortTable('spName')"><div class="th-content">SERVICE PROVIDER <i class="fas fa-sort sort-icon" id="sort-spName"></i></div></th>
+                                    <th>DOCUMENTS</th>
+                                </tr>
+                                <tr class="filter-row">
+                                    <th><input type="text" class="filter-input-sm" data-filter="name" placeholder="Filter Asset..." oninput="applyFilters()"></th>
+                                    <th><input type="text" class="filter-input-sm" data-filter="assigned" placeholder="Filter Person..." oninput="applyFilters()"></th>
+                                    <th><input type="text" class="filter-input-sm" data-filter="warranty" placeholder="e.g. Valid, Due..." oninput="applyFilters()"></th>
+                                    <th><input type="text" class="filter-input-sm" data-filter="service" placeholder="e.g. Due, Overdue..." oninput="applyFilters()"></th>
+                                    <th><input type="text" class="filter-input-sm" data-filter="spName" placeholder="Filter Provider..." oninput="applyFilters()"></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody id="asset-table-body"></tbody>
@@ -906,6 +930,25 @@
                                 <div class="col-full">
                                     <label>Asset Name / Model <span class="req">*</span></label>
                                     <input type="text" id="assetName" class="input" placeholder="e.g., Dell XPS 15 Laptop" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assignment Info -->
+                        <div style="margin-bottom:28px;">
+                            <div class="form-section-title"><i class="fas fa-user-check"></i> Assignment Details</div>
+                            <div class="form-grid form-grid-3">
+                                <div>
+                                    <label>Assigned To (Name)</label>
+                                    <input type="text" id="assignedName" class="input" placeholder="e.g., John Doe">
+                                </div>
+                                <div>
+                                    <label>Contact / Email</label>
+                                    <input type="text" id="assignedContact" class="input" placeholder="e.g., john@company.com">
+                                </div>
+                                <div>
+                                    <label>Department</label>
+                                    <input type="text" id="assignedDept" class="input" placeholder="e.g., IT Support">
                                 </div>
                             </div>
                         </div>
@@ -993,19 +1036,24 @@
 
                         <!-- Service Provider -->
                         <div>
-                            <div class="form-section-title"><i class="fas fa-headset"></i> Service Provider</div>
-                            <div class="form-grid form-grid-2">
-                                <div>
-                                    <label>Provider Name</label>
-                                    <input type="text" id="spName" class="input" placeholder="e.g., ABC Electronics">
-                                </div>
-                                <div>
-                                    <label>Contact Number</label>
-                                    <input type="tel" id="spContact" class="input" placeholder="e.g., 1800-123-456">
-                                </div>
-                                <div class="col-full">
-                                    <label>Address</label>
-                                    <textarea id="spAddress" class="input" rows="2" placeholder="123 Tech Lane, City"></textarea>
+                            <div class="form-section-title" style="justify-content:space-between; display:flex; align-items:center;">
+                                <span><i class="fas fa-headset"></i> Service Providers</span>
+                                <button type="button" class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="addServiceProvider()"><i class="fas fa-plus"></i> Add Extra</button>
+                            </div>
+                            <div id="sp-container">
+                                <div class="sp-block form-grid form-grid-2">
+                                    <div>
+                                        <label>Provider Name</label>
+                                        <input type="text" class="input sp-name" placeholder="e.g., ABC Electronics">
+                                    </div>
+                                    <div>
+                                        <label>Contact Number</label>
+                                        <input type="tel" class="input sp-contact" placeholder="e.g., 1800-123-456">
+                                    </div>
+                                    <div class="col-full">
+                                        <label>Address</label>
+                                        <textarea class="input sp-address" rows="2" placeholder="123 Tech Lane, City"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1069,6 +1117,10 @@
     let pendingPhotoBase64 = '';
     let pendingBillBase64 = '';
 
+    let sortConfig = { key: null, direction: 'asc' };
+    let filterConfig = {};
+    let dashboardFilter = null;
+
     // ── Helpers ──
     function showLoading(msg = 'Loading...') {
         document.getElementById('loader-text').innerText = msg;
@@ -1099,7 +1151,7 @@
         document.getElementById(`view-${v}`).classList.add('active');
         document.getElementById(`nav-${v}`).classList.add('active');
         document.getElementById('content-scroll').scrollTo({ top: 0, behavior: 'smooth' });
-        if (v === 'assets') renderTable(appData);
+        if (v === 'assets') processTableData();
     }
 
     // ── Login ──
@@ -1170,10 +1222,9 @@
             const res = await fetch(`${SCRIPT_URL}?action=getAssets`);
             const result = await res.json();
             if (result.success === true || result.status === 'success') {
-                // IMPORTANT: Ensure appData defaults to a valid array even if API sends null
                 appData = Array.isArray(result.data) ? result.data : [];
                 updateDashboard();
-                if (document.getElementById('view-assets').classList.contains('active')) renderTable(appData);
+                if (document.getElementById('view-assets').classList.contains('active')) processTableData();
             } else {
                 showToast('Failed to load data', 'error');
             }
@@ -1251,6 +1302,27 @@
             const hasDocs = (asset.photoData && asset.photoData.length > 5 && !asset.photoData.startsWith('ERROR')) ||
                             (asset.billData  && asset.billData.length  > 5 && !asset.billData.startsWith('ERROR'));
 
+            const spList = asset.spName ? asset.spName.split(' | ') : [];
+            const spContactList = asset.spContact ? asset.spContact.split(' | ') : [];
+            
+            let spHTML = spList.map((sp, idx) => {
+                if(!sp && !spContactList[idx]) return '';
+                return `<div style="${idx > 0 ? 'margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);' : ''}">
+                    <div style="font-weight:600;font-size:13px;">${sp || '—'}</div>
+                    ${spContactList[idx] ? `<div class="asset-meta" style="margin-top:2px;"><i class="fas fa-phone" style="margin-right:4px;font-size:10px;"></i>${spContactList[idx]}</div>` : ''}
+                </div>`;
+            }).join('');
+            if(!spHTML) spHTML = '—';
+
+            let assignHTML = '—';
+            if(asset.assignedName || asset.assignedDept) {
+                assignHTML = `
+                    <div style="font-weight:600;font-size:13px;color:var(--accent);">${asset.assignedName || 'Unknown'}</div>
+                    ${asset.assignedDept ? `<div class="asset-meta">${asset.assignedDept}</div>` : ''}
+                    ${asset.assignedContact ? `<div class="asset-meta"><i class="fas fa-envelope" style="margin-right:4px;font-size:10px;"></i>${asset.assignedContact}</div>` : ''}
+                `;
+            }
+
             const tr = document.createElement('tr');
             tr.style.animationDelay = `${i * 0.05}s`;
             tr.innerHTML = `
@@ -1263,13 +1335,10 @@
                         </div>
                     </div>
                 </td>
+                <td>${assignHTML}</td>
                 <td><span class="badge ${war.cls}">${war.text}</span><div class="asset-meta" style="margin-top:4px;">${formatDate(asset.warrantyDate)}</div></td>
                 <td><span class="badge ${svc.cls}">${svc.text}</span><div class="asset-meta" style="margin-top:4px;">${formatDate(asset.serviceDate)}</div></td>
-                <td>
-                    <div style="font-weight:600;font-size:14px;">${asset.spName || '—'}</div>
-                    <div class="asset-meta" style="margin-top:2px;"><i class="fas fa-phone" style="margin-right:4px;font-size:10px;"></i>${asset.spContact || '—'}</div>
-                    <div class="asset-meta">${asset.spAddress || ''}</div>
-                </td>
+                <td>${spHTML}</td>
                 <td>
                     ${hasDocs
                         ? `<button class="doc-btn" onclick='openDocModal(${JSON.stringify(asset).replace(/'/g, "&#39;")})'><i class="fas fa-folder-open"></i> View</button>`
@@ -1281,26 +1350,94 @@
         });
     }
 
-    // ── Filters ──
-    function filterAssets(type) {
-        let filtered = [], subtitle = '';
-        if (type === 'service') {
-            filtered = appData.filter(a => { const d = daysBetween(a.serviceDate); return d !== null && d >= 0 && d <= 30; });
-            subtitle = 'Filtered: Service due within 30 days';
-        } else if (type === 'warranty') {
-            filtered = appData.filter(a => { const d = daysBetween(a.warrantyDate); return d !== null && d >= 0 && d <= 30; });
-            subtitle = 'Filtered: Warranty ending within 30 days';
+    // ── Filters & Sorting ──
+    function applyFilters() {
+        const inputs = document.querySelectorAll('.filter-input-sm');
+        filterConfig = {};
+        inputs.forEach(inp => {
+            if(inp.value.trim() !== '') filterConfig[inp.dataset.filter] = inp.value.toLowerCase();
+        });
+        processTableData();
+    }
+
+    function sortTable(key) {
+        if (sortConfig.key === key) {
+            sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortConfig.key = key;
+            sortConfig.direction = 'asc';
         }
+        
+        document.querySelectorAll('.sort-icon').forEach(icon => icon.className = 'fas fa-sort sort-icon');
+        const activeIcon = document.getElementById(`sort-${key}`);
+        if(activeIcon) activeIcon.className = `fas fa-sort-${sortConfig.direction === 'asc' ? 'up' : 'down'} sort-icon active`;
+        
+        processTableData();
+    }
+
+    function processTableData() {
+        let data = [...appData];
+
+        if (dashboardFilter === 'service') {
+            data = data.filter(a => { const d = daysBetween(a.serviceDate); return d !== null && d >= 0 && d <= 30; });
+        } else if (dashboardFilter === 'warranty') {
+            data = data.filter(a => { const d = daysBetween(a.warrantyDate); return d !== null && d >= 0 && d <= 30; });
+        }
+
+        if (Object.keys(filterConfig).length > 0) {
+            data = data.filter(item => {
+                let match = true;
+                if (filterConfig.name && !(item.name || '').toLowerCase().includes(filterConfig.name)) match = false;
+                if (filterConfig.assigned && !((item.assignedName||'')+' '+(item.assignedDept||'')).toLowerCase().includes(filterConfig.assigned)) match = false;
+                if (filterConfig.warranty) {
+                    const status = getStatus(item.warrantyDate).text.toLowerCase();
+                    if (!status.includes(filterConfig.warranty)) match = false;
+                }
+                if (filterConfig.service) {
+                    const status = getStatus(item.serviceDate).text.toLowerCase();
+                    if (!status.includes(filterConfig.service)) match = false;
+                }
+                if (filterConfig.spName && !(item.spName || '').toLowerCase().includes(filterConfig.spName)) match = false;
+                return match;
+            });
+        }
+
+        if (sortConfig.key) {
+            data.sort((a, b) => {
+                let valA = a[sortConfig.key] || '';
+                let valB = b[sortConfig.key] || '';
+                
+                if (sortConfig.key === 'warrantyStatus') {
+                    valA = daysBetween(a.warrantyDate) ?? 9999; valB = daysBetween(b.warrantyDate) ?? 9999;
+                } else if(sortConfig.key === 'serviceStatus') {
+                    valA = daysBetween(a.serviceDate) ?? 9999; valB = daysBetween(b.serviceDate) ?? 9999;
+                } else {
+                    valA = valA.toString().toLowerCase(); valB = valB.toString().toLowerCase();
+                }
+
+                if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        renderTable(data);
+    }
+
+    function filterAssets(type) {
+        dashboardFilter = type;
+        let subtitle = type === 'service' ? 'Filtered: Service due within 30 days' : 'Filtered: Warranty ending within 30 days';
         document.getElementById('list-subtitle').innerText = subtitle;
         document.getElementById('clear-filter-btn').classList.remove('hidden');
         switchView('assets');
-        renderTable(filtered);
     }
 
     function clearFilters() {
+        dashboardFilter = null;
         document.getElementById('list-subtitle').innerText = 'Showing all active assets';
         document.getElementById('clear-filter-btn').classList.add('hidden');
-        renderTable(appData);
+        document.querySelectorAll('.filter-input-sm').forEach(i => i.value = '');
+        filterConfig = {};
+        processTableData();
     }
 
     // ── PDF Export ──
@@ -1313,9 +1450,18 @@
         doc.text(`Asset Report — ${dateStr}`, 14, 22);
         doc.setFontSize(11); doc.setTextColor(100);
         doc.text(document.getElementById('list-subtitle').innerText, 14, 30);
-        const cols = ['Asset Name', 'Purchase Date', 'Warranty End', 'Service Due', 'Provider', 'Contact', 'Address'];
-        const rows = currentDisplayedData.map(a => [a.name || '—', formatDate(a.purchaseDate), formatDate(a.warrantyDate), formatDate(a.serviceDate), a.spName || '—', a.spContact || '—', a.spAddress || '—']);
-        doc.autoTable({ head: [cols], body: rows, startY: 35, theme: 'striped', headStyles: { fillColor: [220, 38, 38] }, styles: { fontSize: 9, cellPadding: 3, font: 'helvetica' }, columnStyles: { 0: { cellWidth: 40 }, 6: { cellWidth: 50 } }, didDrawPage: (d) => { doc.setFontSize(8); doc.setTextColor(160); doc.text(`Generated ${dateStr} | Page ${doc.internal.getNumberOfPages()}`, d.settings.margin.left, doc.internal.pageSize.height - 10); } });
+        
+        const cols = ['Asset Name', 'Assigned To', 'Purchase Date', 'Warranty End', 'Service Due', 'Providers'];
+        const rows = currentDisplayedData.map(a => [
+            a.name || '—', 
+            a.assignedName ? `${a.assignedName} (${a.assignedDept || 'N/A'})` : '—',
+            formatDate(a.purchaseDate), 
+            formatDate(a.warrantyDate), 
+            formatDate(a.serviceDate), 
+            a.spName ? a.spName.replace(/ \| /g, ', ') : '—'
+        ]);
+        
+        doc.autoTable({ head: [cols], body: rows, startY: 35, theme: 'striped', headStyles: { fillColor: [79, 70, 229] }, styles: { fontSize: 9, cellPadding: 3 }, columnStyles: { 0: { cellWidth: 40 }, 5: { cellWidth: 50 } }, didDrawPage: (d) => { doc.setFontSize(8); doc.setTextColor(160); doc.text(`Generated ${dateStr} | Page ${doc.internal.getNumberOfPages()}`, d.settings.margin.left, doc.internal.pageSize.height - 10); } });
         doc.save(`Asset_Report_${dateStr.replace(/,/g, '').replace(/ /g, '_')}.pdf`);
         showToast('PDF exported!', 'success');
     }
@@ -1417,19 +1563,67 @@
         document.getElementById('bill-initial').classList.remove('hidden');
     }
 
+    function addServiceProvider() {
+        const container = document.getElementById('sp-container');
+        const block = document.createElement('div');
+        block.className = 'sp-block form-grid form-grid-2';
+        block.innerHTML = `
+            <button type="button" class="sp-remove" onclick="this.parentElement.remove()" title="Remove Provider"><i class="fas fa-times"></i></button>
+            <div>
+                <label>Provider Name</label>
+                <input type="text" class="input sp-name" placeholder="e.g., ABC Electronics">
+            </div>
+            <div>
+                <label>Contact Number</label>
+                <input type="tel" class="input sp-contact" placeholder="e.g., 1800-123-456">
+            </div>
+            <div class="col-full">
+                <label>Address</label>
+                <textarea class="input sp-address" rows="2" placeholder="123 Tech Lane, City"></textarea>
+            </div>
+        `;
+        container.appendChild(block);
+    }
+
+    function resetSPBlocks() {
+        document.getElementById('sp-container').innerHTML = `
+            <div class="sp-block form-grid form-grid-2">
+                <div>
+                    <label>Provider Name</label>
+                    <input type="text" class="input sp-name" placeholder="e.g., ABC Electronics">
+                </div>
+                <div>
+                    <label>Contact Number</label>
+                    <input type="tel" class="input sp-contact" placeholder="e.g., 1800-123-456">
+                </div>
+                <div class="col-full">
+                    <label>Address</label>
+                    <textarea class="input sp-address" rows="2" placeholder="123 Tech Lane, City"></textarea>
+                </div>
+            </div>
+        `;
+    }
+
     // ── Form Submit ──
     document.getElementById('add-asset-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         showLoading('Saving asset...');
         try {
+            const spNames = Array.from(document.querySelectorAll('.sp-name')).map(el => el.value);
+            const spContacts = Array.from(document.querySelectorAll('.sp-contact')).map(el => el.value);
+            const spAddresses = Array.from(document.querySelectorAll('.sp-address')).map(el => el.value);
+
             const asset = {
                 name: document.getElementById('assetName').value,
                 purchaseDate: document.getElementById('purchaseDate').value,
                 warrantyDate: document.getElementById('warrantyDate').value,
                 serviceDate:  document.getElementById('serviceDate').value,
-                spName:    document.getElementById('spName').value,
-                spContact: document.getElementById('spContact').value,
-                spAddress: document.getElementById('spAddress').value,
+                assignedName: document.getElementById('assignedName').value || '',
+                assignedContact: document.getElementById('assignedContact').value || '',
+                assignedDept: document.getElementById('assignedDept').value || '',
+                spName:    spNames.join(' | '),
+                spContact: spContacts.join(' | '),
+                spAddress: spAddresses.join(' | '),
                 photoData: pendingPhotoBase64,
                 billData:  pendingBillBase64
             };
@@ -1437,7 +1631,7 @@
             const result = await res.json();
             if (result.success === true || result.status === 'success') {
                 showToast('Asset saved!', 'success');
-                e.target.reset(); removePhoto(); removeBill();
+                e.target.reset(); removePhoto(); removeBill(); resetSPBlocks();
                 fetchData(); switchView('assets');
             } else {
                 showToast('Server error: ' + (result.message || 'Could not save'), 'error');
