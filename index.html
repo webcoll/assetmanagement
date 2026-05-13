@@ -1108,7 +1108,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6JlwSwciX7qhLVo8qusXfSxCfyePeCZ9fVakUafFkG1_SQPZLFLRiZ3ZYcxB_ZOYMaw/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwokG_mBavjcnarjm1E30d9gll5OoL8g8-KByaPScItJyMiZkncX0HH0SMZKxknUAQ2tg/exec';
 
     let appData = [];
     let currentDisplayedData = [];
@@ -1297,13 +1297,14 @@
         empty.classList.remove('show');
 
         data.forEach((asset, i) => {
-            const svc = getStatus(asset.serviceDate);
-            const war = getStatus(asset.warrantyDate);
+            // Safely handle missing dates
+            const svc = getStatus(asset.serviceDate || null);
+            const war = getStatus(asset.warrantyDate || null);
             const hasDocs = (asset.photoData && asset.photoData.length > 5 && !asset.photoData.startsWith('ERROR')) ||
                             (asset.billData  && asset.billData.length  > 5 && !asset.billData.startsWith('ERROR'));
 
-            const spList = asset.spName ? asset.spName.split(' | ') : [];
-            const spContactList = asset.spContact ? asset.spContact.split(' | ') : [];
+            const spList = (asset.spName || '').split(' | ');
+            const spContactList = (asset.spContact || '').split(' | ');
             
             let spHTML = spList.map((sp, idx) => {
                 if(!sp && !spContactList[idx]) return '';
@@ -1330,14 +1331,14 @@
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div class="asset-avatar"><i class="fas fa-laptop"></i></div>
                         <div>
-                            <div class="asset-name">${asset.name}</div>
-                            <div class="asset-meta">Purchased ${formatDate(asset.purchaseDate)}</div>
+                            <div class="asset-name">${asset.name || 'Unnamed Asset'}</div>
+                            <div class="asset-meta">Purchased ${formatDate(asset.purchaseDate || null)}</div>
                         </div>
                     </div>
                 </td>
                 <td>${assignHTML}</td>
-                <td><span class="badge ${war.cls}">${war.text}</span><div class="asset-meta" style="margin-top:4px;">${formatDate(asset.warrantyDate)}</div></td>
-                <td><span class="badge ${svc.cls}">${svc.text}</span><div class="asset-meta" style="margin-top:4px;">${formatDate(asset.serviceDate)}</div></td>
+                <td><span class="badge ${war.cls}">${war.text}</span><div class="asset-meta" style="margin-top:4px;">${formatDate(asset.warrantyDate || null)}</div></td>
+                <td><span class="badge ${svc.cls}">${svc.text}</span><div class="asset-meta" style="margin-top:4px;">${formatDate(asset.serviceDate || null)}</div></td>
                 <td>${spHTML}</td>
                 <td>
                     ${hasDocs
@@ -1455,13 +1456,13 @@
         const rows = currentDisplayedData.map(a => [
             a.name || '—', 
             a.assignedName ? `${a.assignedName} (${a.assignedDept || 'N/A'})` : '—',
-            formatDate(a.purchaseDate), 
-            formatDate(a.warrantyDate), 
-            formatDate(a.serviceDate), 
+            formatDate(a.purchaseDate || null), 
+            formatDate(a.warrantyDate || null), 
+            formatDate(a.serviceDate || null), 
             a.spName ? a.spName.replace(/ \| /g, ', ') : '—'
         ]);
         
-        doc.autoTable({ head: [cols], body: rows, startY: 35, theme: 'striped', headStyles: { fillColor: [79, 70, 229] }, styles: { fontSize: 9, cellPadding: 3 }, columnStyles: { 0: { cellWidth: 40 }, 5: { cellWidth: 50 } }, didDrawPage: (d) => { doc.setFontSize(8); doc.setTextColor(160); doc.text(`Generated ${dateStr} | Page ${doc.internal.getNumberOfPages()}`, d.settings.margin.left, doc.internal.pageSize.height - 10); } });
+        doc.autoTable({ head: [cols], body: rows, startY: 35, theme: 'striped', headStyles: { fillColor: [220, 38, 38] }, styles: { fontSize: 9, cellPadding: 3 }, columnStyles: { 0: { cellWidth: 40 }, 5: { cellWidth: 50 } }, didDrawPage: (d) => { doc.setFontSize(8); doc.setTextColor(160); doc.text(`Generated ${dateStr} | Page ${doc.internal.getNumberOfPages()}`, d.settings.margin.left, doc.internal.pageSize.height - 10); } });
         doc.save(`Asset_Report_${dateStr.replace(/,/g, '').replace(/ /g, '_')}.pdf`);
         showToast('PDF exported!', 'success');
     }
