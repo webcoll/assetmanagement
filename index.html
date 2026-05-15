@@ -139,6 +139,11 @@
         .btn-ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--border); }
         .btn-ghost:hover { background: var(--surface-2); color: var(--ink); border-color: #d1d5db; }
 
+        #progress-wrap { width: 220px; text-align: center; margin-top: 12px; transition: opacity 0.3s; }
+        .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-text { font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-top: 8px; font-family: 'Roboto', sans-serif; }
+
         .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); animation: fadeIn 0.5s ease; }
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; text-align: left; }
@@ -227,6 +232,12 @@
 <div id="global-loader" class="hidden">
     <div class="loader-ring"></div>
     <span id="loader-text">Loading...</span>
+    <div id="progress-wrap" class="hidden">
+        <div class="progress-track">
+            <div id="loader-progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="loader-percentage" class="progress-text">0%</div>
+    </div>
 </div>
 
 <div id="auth-view" class="auth-view">
@@ -369,7 +380,7 @@
                         <div class="stat-badge"><i class="fas fa-shield"></i> Within 30 days</div>
                         <i class="fas fa-shield-alt stat-icon"></i>
                     </div>
-                    <div class="stat-card red clickable" onclick="switchView('admin-tickets')">
+                    <div class="stat-card red clickable" onclick="filterTickets('Open')">
                         <div class="stat-label">Open Tickets</div>
                         <div class="stat-value" id="stat-tickets">0</div>
                         <div class="stat-badge"><i class="fas fa-ticket"></i> Action required</div>
@@ -621,7 +632,14 @@
             <div id="view-admin-tickets" class="view-layer">
                 <div class="page-header">
                     <div><h2 class="page-title">Ticket Management</h2><p class="page-sub">Resolve user issues & Automated Service Tickets</p></div>
-                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
+                    <div style="display:flex;gap:10px;">
+                        <select id="filt-ticket-status" class="input" style="width:auto; padding:8px 12px;" onchange="renderTickets()">
+                            <option value="">All Statuses</option>
+                            <option value="Open">Open</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                        <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
+                    </div>
                 </div>
                 <div class="table-card">
                     <div class="table-wrap">
@@ -675,14 +693,19 @@
     <div class="modal-box">
         <div class="modal-header">
             <h3 class="modal-title" id="doc-modal-title">Documents</h3>
-            <button class="modal-close" onclick="closeModal('doc-modal')"><i class="fas fa-times"></i></button>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <a id="doc-new-tab-btn" href="#" target="_blank" class="btn btn-ghost" style="padding: 6px 12px; font-size: 13px; text-decoration: none;"><i class="fas fa-external-link-alt"></i> Open in New Tab</a>
+                <button class="modal-close" onclick="closeModal('doc-modal')"><i class="fas fa-times"></i></button>
+            </div>
         </div>
-        <div class="modal-body" style="padding:0; overflow:hidden;">
-            <div id="doc-tabs-header" style="display:flex;gap:4px;padding:12px;background:var(--surface);border-bottom:1px solid var(--border); overflow-x:auto;">
+        <div class="modal-body" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
+            <div id="doc-tabs-header" style="display:flex;gap:4px;padding:12px;background:var(--surface);border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0;">
                 <!-- Dynamic Buttons generated here -->
             </div>
-            <div style="flex:1; background:#e5e7eb; position:relative; min-height:400px;">
-                <iframe id="doc-iframe" style="width:100%;height:100%;border:0;position:absolute;inset:0; transition: opacity 0.3s ease;"></iframe>
+            <!-- FIXED: Dynamic container for both Image and PDF iframe -->
+            <div style="flex:1; background:#e5e7eb; position:relative; min-height:400px; display:flex; align-items:center; justify-content:center; overflow:auto;">
+                <img id="doc-img" style="max-width:100%; max-height:100%; display:none; object-fit:contain;" src="">
+                <iframe id="doc-iframe" style="width:100%;height:100%;border:0;position:absolute;inset:0; display:none; transition: opacity 0.3s ease;"></iframe>
             </div>
         </div>
     </div>
@@ -766,20 +789,67 @@
     // ==========================================
     // DEPLOYMENT: REPLACE THIS URL WITH YOUR NEW APPS SCRIPT WEB APP URL
     // ==========================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxR5lpZSsH7btE1KmDg7kByxrW4plh6SIVflLL3iKUv0cz0FUAlJztc7OMBhr6w74nSA/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2bOWTESDeQbXO5tn_964LwBn_b58A1arZHmbAe3bXM-iNeEWlp2lC-aVzpUgQEalk-Q/exec'; 
 
     let currentUser = null; 
     let appData = { assets: [], tickets: [], users: [] };
     let filesData = { photo: '', bill: '', proof: '', issueProof: '', repairBill: '' };
     let sortConfig = { table: null, key: null, dir: 'asc' };
+    let currentQuickFilter = null;
     let currentModalAssetUrls = {};
+
+    let progressTimer;
+    let currentPct = 0;
+
+    function startProgress(msg) {
+        document.getElementById('loader-text').innerText = msg;
+        document.getElementById('loader-percentage').innerText = '0%';
+        document.getElementById('loader-progress-bar').style.width = '0%';
+        document.getElementById('progress-wrap').classList.remove('hidden');
+        
+        const l = document.getElementById('global-loader');
+        l.classList.remove('hidden'); 
+        setTimeout(() => l.style.opacity = '1', 10);
+
+        currentPct = 0;
+        clearInterval(progressTimer);
+        // Slowly increment up to 85% to simulate network wait time
+        progressTimer = setInterval(() => {
+            if(currentPct < 85) {
+                const increment = Math.random() * (85 - currentPct) * 0.05 + 0.5;
+                currentPct += increment;
+                updateProgressUI(currentPct);
+            }
+        }, 150);
+    }
+
+    function updateProgress(pct, msg) {
+        if(msg) document.getElementById('loader-text').innerText = msg;
+        currentPct = pct;
+        updateProgressUI(currentPct);
+    }
+
+    function finishProgress() {
+        clearInterval(progressTimer);
+        currentPct = 100;
+        updateProgressUI(100);
+        document.getElementById('loader-text').innerText = 'Ready!';
+    }
+
+    function updateProgressUI(pct) {
+        const p = Math.min(100, Math.round(pct));
+        document.getElementById('loader-percentage').innerText = `${p}%`;
+        document.getElementById('loader-progress-bar').style.width = `${p}%`;
+    }
 
     function showLoading(msg = 'Loading...') { 
         document.getElementById('loader-text').innerText = msg; 
+        document.getElementById('progress-wrap').classList.add('hidden'); // Hide bar for normal brief loads
         const l = document.getElementById('global-loader');
         l.classList.remove('hidden'); 
         setTimeout(() => l.style.opacity = '1', 10);
     }
+    
     function hideLoading() { 
         const l = document.getElementById('global-loader');
         l.style.opacity = '0';
@@ -799,15 +869,28 @@
     }
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault(); showLoading('Signing in...');
+        e.preventDefault(); 
         const err = document.getElementById('login-error'); err.style.display = 'none';
+        
+        startProgress('Authenticating user...');
+        
         try {
             const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', userId: document.getElementById('login-userId').value, password: document.getElementById('login-password').value }) });
             const data = await res.json();
-            if (data.success) { currentUser = data.user; setupEnvironment(); } 
-            else { err.style.display = 'block'; document.getElementById('login-error-text').innerText = data.message; }
-        } catch(e) { err.style.display='block'; document.getElementById('login-error-text').innerText = 'Network error'; }
-        hideLoading();
+            
+            if (data.success) { 
+                currentUser = data.user; 
+                updateProgress(35, 'Connecting to database...');
+                await initializeAppData(); 
+            } else { 
+                err.style.display = 'block'; 
+                document.getElementById('login-error-text').innerText = data.message; 
+                hideLoading();
+            }
+        } catch(e) { 
+            err.style.display='block'; document.getElementById('login-error-text').innerText = 'Network error'; 
+            hideLoading();
+        }
     });
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
@@ -827,6 +910,45 @@
         document.getElementById('login-form').reset();
         document.getElementById('app-view').classList.add('hidden');
         document.getElementById('auth-view').classList.remove('hidden');
+    }
+
+    /* STREAMING_CHUNK: Adding dedicated initialize phase to load data *before* showing app UI */
+    async function initializeAppData() {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getAppData&role=${currentUser.role}&userId=${encodeURIComponent(currentUser.userId)}&userName=${encodeURIComponent(currentUser.name)}`);
+            updateProgress(75, 'Processing assets and tickets...');
+            const result = await res.json();
+            
+            if (result.success) {
+                appData = {
+                    assets: result.assets || [],
+                    tickets: result.tickets || [],
+                    users: result.users || []
+                };
+                
+                // Populate user suggestions for Add Asset form
+                const dl = document.getElementById('user-names-list');
+                if (dl) {
+                    dl.innerHTML = '';
+                    appData.users.forEach(u => dl.innerHTML += `<option value="${u.name}">`);
+                }
+                
+                updateProgress(95, 'Preparing dashboard...');
+                finishProgress();
+                
+                // Allow user to see 100% briefly before switching view
+                setTimeout(() => {
+                    setupEnvironment();
+                }, 400); 
+
+            } else {
+                showToast('Failed to sync data', 'error');
+                hideLoading();
+            }
+        } catch(e) { 
+            showToast('Connection Error', 'error'); console.error(e); 
+            hideLoading();
+        }
     }
 
     function setupEnvironment() {
@@ -864,8 +986,10 @@
         }
         mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="logout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt" style="color:var(--danger)"></i> Sign Out</button>`;
 
-        fetchData();
+        if(currentUser.role === 'Admin') updateDashboard();
         switchView(isAdmin ? 'dashboard' : 'my-assets');
+        
+        hideLoading(); // Finally dismiss the loader overlay
     }
 
     function switchView(viewId) {
@@ -955,7 +1079,14 @@
         else if (targetTable === 'my-assets') renderMyAssets();
     }
 
+    function filterTickets(status) {
+        const select = document.getElementById('filt-ticket-status');
+        if (select) select.value = status;
+        switchView('admin-tickets');
+    }
+
     function clearAssetFilters() {
+        currentQuickFilter = null;
         document.getElementById('filt-asset').value = '';
         document.getElementById('filt-assign').value = '';
         document.getElementById('filt-war').value = '';
@@ -970,9 +1101,11 @@
 
     function filterAssets(quickFilter) {
         clearAssetFilters();
-        if(quickFilter === 'service') { document.getElementById('list-subtitle').innerText = 'Filtered: Service due soon (Showing all for full context)'; }
-        if(quickFilter === 'warranty') { document.getElementById('list-subtitle').innerText = 'Filtered: Warranty ending soon (Showing all for full context)'; }
-        document.getElementById('clear-filter-btn').classList.remove('hidden');
+        currentQuickFilter = quickFilter;
+        if(quickFilter === 'service') { document.getElementById('list-subtitle').innerText = 'Filtered: Service due within 30 days'; }
+        if(quickFilter === 'warranty') { document.getElementById('list-subtitle').innerText = 'Filtered: Warranty ending within 30 days'; }
+        
+        // Let renderAssets decide visibility based on currentQuickFilter
         switchView('assets');
     }
 
@@ -988,8 +1121,12 @@
         const fStatus = document.getElementById('filt-status') ? document.getElementById('filt-status').value : '';
         const fOwnership = document.getElementById('filt-ownership') ? document.getElementById('filt-ownership').value : '';
         
-        if(fAst || fAsg || fSp || fWar || fSvc || fStatus || fOwnership) document.getElementById('clear-filter-btn').classList.remove('hidden');
-        else document.getElementById('clear-filter-btn').classList.add('hidden');
+        // FIXED: Now we also check if a currentQuickFilter is active to show the clear button
+        if(fAst || fAsg || fSp || fWar || fSvc || fStatus || fOwnership || currentQuickFilter) {
+            document.getElementById('clear-filter-btn').classList.remove('hidden');
+        } else {
+            document.getElementById('clear-filter-btn').classList.add('hidden');
+        }
         
         data = data.filter(a => {
             const nameStr = String(a.name || '').toLowerCase();
@@ -1008,6 +1145,18 @@
                 if (fOwnership === 'own' && o !== 'own' && o !== 'owned') return false;
                 if (fOwnership === 'rented' && o !== 'rented') return false;
             }
+            
+            if (currentQuickFilter === 'service') {
+                if (!a.serviceDate || isNaN(new Date(a.serviceDate))) return false;
+                const days = Math.ceil((new Date(a.serviceDate) - new Date()) / 86400000);
+                if (days > 30) return false;
+            }
+            if (currentQuickFilter === 'warranty') {
+                if (!a.warrantyDate || isNaN(new Date(a.warrantyDate))) return false;
+                const days = Math.ceil((new Date(a.warrantyDate) - new Date()) / 86400000);
+                if (days > 30) return false;
+            }
+            
             return true;
         });
 
@@ -1119,8 +1268,10 @@
         data.forEach(a => {
             const tr = document.createElement('tr');
             const safeA = (a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) ? a.photoData : '';
+            
+            // FIXED: Passing the ID instead of the massive Base64 string to avoid HTML parsing errors
             const photoBtn = safeA 
-                ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="openDocModal([{name:'Asset Photo', url:'${safeA}', icon:'fa-image'}])"><i class="fas fa-image"></i> View Photo</button>`
+                ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="viewMyAssetPhoto('${a.id}')"><i class="fas fa-image"></i> View Photo</button>`
                 : `<span style="font-size:12px;color:#9ca3af">No Photo Available</span>`;
 
             tr.innerHTML = `
@@ -1287,8 +1438,16 @@
         hideLoading();
     });
 
+    // FIXED: Helper function to retrieve the photo safely based on asset ID
+    function viewMyAssetPhoto(id) {
+        const a = appData.assets.find(x => String(x.id) === String(id));
+        if(a && a.photoData) {
+            openDocModal([{name: 'Asset Photo', url: a.photoData, icon: 'fa-image'}]);
+        }
+    }
+
     function viewTicketDocs(ticketId) {
-        const t = appData.tickets.find(x => x.id === ticketId);
+        const t = appData.tickets.find(x => String(x.id) === String(ticketId));
         if(!t) return;
         let docs = [];
         if(t.issueProof && t.issueProof.length > 5) docs.push({name: 'Issue Proof', url: t.issueProof, icon: 'fa-camera'});
@@ -1298,7 +1457,7 @@
     }
     
     function viewAssetDocs(assetId) {
-        const a = appData.assets.find(x => x.id === assetId);
+        const a = appData.assets.find(x => String(x.id) === String(assetId));
         if(!a) return;
         let docs = [];
         if(a.photoData && a.photoData.length > 5) docs.push({name: 'Photo', url: a.photoData, icon: 'fa-image'});
@@ -1309,6 +1468,7 @@
     function renderTickets() {
         const aTbody = document.getElementById('admin-ticket-body');
         const uTbody = document.getElementById('user-ticket-body');
+        const filtStatus = document.getElementById('filt-ticket-status') ? document.getElementById('filt-ticket-status').value : '';
         if(aTbody) aTbody.innerHTML = '';
         if(uTbody) uTbody.innerHTML = '';
 
@@ -1344,6 +1504,8 @@
             if (t.isAuto) statusBadge = `<span class="badge badge-warning">Action Req</span>`;
 
             if (currentUser.role === 'Admin' && aTbody) {
+                if (filtStatus && t.status !== filtStatus) return; // Apply Ticket Filter
+                
                 let adminDocsBtn = `<span style="font-size:11px;color:#9ca3af">No Docs</span>`;
                 let resolveBtn = '';
 
@@ -1461,31 +1623,50 @@
         });
         
         if(firstDoc) {
-            const iframe = document.getElementById('doc-iframe');
-            iframe.style.opacity = 0;
-            iframe.src = firstDoc.url;
-            setTimeout(() => iframe.style.opacity = 1, 150);
             document.getElementById('doc-modal').classList.add('show');
+            // Trigger the display logic on the first doc
+            showIframe(firstDoc.name, header);
         } else {
             showToast('No valid documents to display', 'error');
         }
     }
 
     function showIframe(name, header) {
+        // Update active tab styles
         Array.from(header.children).forEach(b => {
             b.className = b.innerText.trim() === name.trim() ? 'btn btn-primary' : 'btn btn-ghost';
         });
+        
+        const url = currentModalAssetUrls[name];
+        document.getElementById('doc-new-tab-btn').href = url;
+        
         const iframe = document.getElementById('doc-iframe');
-        iframe.style.opacity = 0;
-        setTimeout(() => {
-            iframe.src = currentModalAssetUrls[name];
+        const img = document.getElementById('doc-img');
+        
+        // FIXED: Check MIME type. Iframes fail with Base64 images often. Use IMG tag for images.
+        if (url.startsWith('data:image/')) {
+            iframe.style.display = 'none';
+            iframe.src = ''; // Clear iframe memory
+            
+            img.src = url;
+            img.style.display = 'block';
+        } else {
+            // Assume it is a PDF or generic file format that can use iframe
+            img.style.display = 'none';
+            img.src = '';
+            
+            iframe.style.display = 'block';
             iframe.style.opacity = 1;
-        }, 150);
+            iframe.src = url;
+        }
     }
 
     function closeModal(id) { 
         document.getElementById(id).classList.remove('show'); 
-        if(id === 'doc-modal') setTimeout(()=> document.getElementById('doc-iframe').src = '', 300);
+        if(id === 'doc-modal') {
+             document.getElementById('doc-iframe').src = '';
+             document.getElementById('doc-img').src = '';
+        }
     }
 
     // Standard Issue Resolve
