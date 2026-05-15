@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AMS — Asset Management</title>
-    <!-- Professional Fonts: Inter for UI, Roboto for headings -->
+    <!-- Professional Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
@@ -14,18 +14,15 @@
     
     <style>
         :root {
-            /* Professional Red Theme */
+            var(--ink): #111827;
             --ink: #111827;
             --ink-soft: #374151;
             --surface: #f9fafb;
             --surface-2: #f3f4f6;
             --white: #ffffff;
-            
-            /* Primary Red accents */
-            --accent: #dc2626;      /* Red 600 */
-            --accent-glow: #ef4444; /* Red 500 */
-            --accent-soft: #fee2e2; /* Red 100 */
-            
+            --accent: #dc2626;
+            --accent-glow: #ef4444;
+            --accent-soft: #fee2e2;
             --gold: #d97706;
             --gold-soft: #fef3c7;
             --danger: #b91c1c;
@@ -33,7 +30,6 @@
             --success: #059669;
             --success-soft: #d1fae5;
             --border: #e5e7eb;
-            
             --radius: 12px;
             --radius-sm: 8px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -42,70 +38,32 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--surface);
-            color: var(--ink);
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
+        body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--ink); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; -webkit-font-smoothing: antialiased; }
         h1, h2, h3, h4, .heading { font-family: 'Roboto', sans-serif; letter-spacing: -0.01em; }
-
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Loader */
-        #global-loader {
-            position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px);
-            z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
-        }
+        #global-loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
         #global-loader.hidden { display: none; }
-        .loader-ring {
-            width: 40px; height: 40px; border: 3px solid var(--accent-soft); border-top-color: var(--accent);
-            border-radius: 50%; animation: spin 0.8s linear infinite;
-        }
+        .loader-ring { width: 40px; height: 40px; border: 3px solid var(--accent-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #loader-text { font-size: 14px; font-weight: 500; color: var(--ink-soft); }
 
-        .auth-view {
-            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-            z-index: 100; background: var(--ink); overflow: hidden;
-        }
+        .auth-view { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100; background: var(--ink); overflow: hidden; }
         .auth-bg { position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(220,38,38,0.15), transparent 50%), var(--ink); }
-        .auth-card {
-            position: relative; z-index: 2; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px); border-radius: 20px; padding: 40px; width: 100%; max-width: 400px; margin: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            animation: fadeIn 0.4s ease-out both;
-        }
+        .auth-card { position: relative; z-index: 2; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px); border-radius: 20px; padding: 40px; width: 100%; max-width: 400px; margin: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: fadeIn 0.4s ease-out both; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .auth-logo {
-            width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), #f87171);
-            border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: #fff; margin: 0 auto 20px; box-shadow: 0 8px 16px rgba(220,38,38,0.3);
-        }
+        .auth-logo { width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), #f87171); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; margin: 0 auto 20px; box-shadow: 0 8px 16px rgba(220,38,38,0.3); }
         .auth-title { font-size: 24px; font-weight: 900; color: #fff; text-align: center; }
         .auth-sub { font-size: 14px; color: #9ca3af; text-align: center; margin-top: 4px; margin-bottom: 24px; }
         .auth-label { font-size: 12px; font-weight: 600; color: #9ca3af; text-transform: uppercase; margin-bottom: 8px; display: block; }
         .auth-input-wrap { position: relative; margin-bottom: 16px; }
         .auth-input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 14px; pointer-events: none; }
-        .auth-input {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
-            color: #fff; padding: 10px 14px 10px 38px; font-size: 14px; outline: none; transition: all 0.2s; font-family: 'Inter', sans-serif;
-        }
+        .auth-input { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); color: #fff; padding: 10px 14px 10px 38px; font-size: 14px; outline: none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
         .auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(220,38,38,0.15); }
-        .auth-btn {
-            width: 100%; padding: 12px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600;
-            border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; margin-top: 8px;
-        }
+        .auth-btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; margin-top: 8px; }
         .auth-btn:hover { background: var(--accent-glow); }
         .auth-toggle { text-align: center; margin-top: 20px; font-size: 13px; color: #9ca3af; }
         .auth-toggle a { color: var(--accent-glow); text-decoration: none; font-weight: 500; cursor: pointer; }
@@ -250,7 +208,7 @@
         .view-layer { display: none; }
         .view-layer.active { display: block; animation: fadeIn 0.3s ease-out both; }
         
-        .admin-only { display: none; }
+        .admin-only, .sub-admin-only, .non-admin { display: none; }
     </style>
 </head>
 <body>
@@ -262,28 +220,23 @@
 
 <div id="auth-view" class="auth-view">
     <div class="auth-bg"></div>
-    
     <!-- LOGIN FORM -->
     <div class="auth-card" id="login-card">
         <div class="auth-logo"><i class="fas fa-boxes"></i></div>
         <h1 class="auth-title">AMS Login</h1>
         <p class="auth-sub">Sign in to manage assets & issues</p>
-
         <div id="login-error" class="auth-error"><i class="fas fa-circle-exclamation"></i> <span id="login-error-text">Invalid credentials</span></div>
-
         <form id="login-form">
             <label class="auth-label">User ID</label>
             <div class="auth-input-wrap">
                 <i class="auth-input-icon fas fa-user"></i>
                 <input type="text" id="login-userId" class="auth-input" placeholder="Enter your ID" required>
             </div>
-
             <label class="auth-label">Password</label>
             <div class="auth-input-wrap">
                 <i class="auth-input-icon fas fa-lock"></i>
                 <input type="password" id="login-password" class="auth-input" placeholder="••••••••" required>
             </div>
-
             <button type="submit" class="auth-btn">Sign In</button>
         </form>
         <div class="auth-toggle">New here? <a onclick="toggleAuth('register')">Create an account</a></div>
@@ -294,28 +247,23 @@
         <div class="auth-logo"><i class="fas fa-user-plus"></i></div>
         <h1 class="auth-title">Register</h1>
         <p class="auth-sub">Create a new user account</p>
-
         <div id="reg-error" class="auth-error"><i class="fas fa-circle-exclamation"></i> <span id="reg-error-text">Error</span></div>
-
         <form id="register-form">
             <label class="auth-label">Full Name</label>
             <div class="auth-input-wrap">
                 <i class="auth-input-icon fas fa-id-badge"></i>
                 <input type="text" id="reg-name" class="auth-input" placeholder="John Doe" required>
             </div>
-
             <label class="auth-label">Desired User ID</label>
             <div class="auth-input-wrap">
                 <i class="auth-input-icon fas fa-user"></i>
                 <input type="text" id="reg-userId" class="auth-input" placeholder="johndoe123" required>
             </div>
-
             <label class="auth-label">Password</label>
             <div class="auth-input-wrap">
                 <i class="auth-input-icon fas fa-lock"></i>
                 <input type="password" id="reg-password" class="auth-input" placeholder="••••••••" required>
             </div>
-
             <button type="submit" class="auth-btn">Register</button>
         </form>
         <div class="auth-toggle">Already registered? <a onclick="toggleAuth('login')">Sign In</a></div>
@@ -329,7 +277,6 @@
             <div class="brand-icon"><i class="fas fa-boxes"></i></div>
             <div class="brand-name">AMS</div>
         </div>
-        
         <div class="user-profile-sm">
             <div class="user-avatar" id="sidebar-avatar">U</div>
             <div class="user-info-sm">
@@ -342,22 +289,28 @@
             <!-- Admin Only Links -->
             <div class="admin-only">
                 <div class="nav-section-label">Management</div>
-                <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn active"><i class="fas fa-chart-pie"></i> Dashboard</button>
-                <button onclick="switchView('assets')" id="nav-assets" class="nav-btn"><i class="fas fa-list-ul"></i> All Assets</button>
-                <button onclick="switchView('add-asset')" id="nav-add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
-                
+                <button onclick="switchView('dashboard')" data-view="dashboard" class="nav-btn active"><i class="fas fa-chart-pie"></i> Dashboard</button>
+                <button onclick="switchView('assets')" data-view="assets" class="nav-btn"><i class="fas fa-list-ul"></i> All Assets</button>
+                <button onclick="switchView('add-asset')" data-view="add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
                 <div class="nav-section-label">Redressal</div>
-                <button onclick="switchView('admin-tickets')" id="nav-admin-tickets" class="nav-btn"><i class="fas fa-ticket-alt"></i> All Tickets</button>
-                
+                <button onclick="switchView('admin-tickets')" data-view="admin-tickets" class="nav-btn"><i class="fas fa-ticket-alt"></i> All Tickets</button>
                 <div class="nav-section-label">System</div>
-                <button onclick="switchView('admin-users')" id="nav-admin-users" class="nav-btn"><i class="fas fa-users"></i> Users</button>
+                <button onclick="switchView('admin-users')" data-view="admin-users" class="nav-btn"><i class="fas fa-users"></i> Users</button>
             </div>
 
-            <!-- User Only Links -->
-            <div class="user-only" style="display:none;">
+            <!-- Sub-Admin Additions -->
+            <div class="sub-admin-only">
+                <div class="nav-section-label">Management</div>
+                <button onclick="switchView('add-asset')" data-view="add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
+            </div>
+
+            <!-- User & Sub-Admin Only Links -->
+            <div class="non-admin">
+                <div class="nav-section-label">My Access</div>
+                <button onclick="switchView('my-assets')" data-view="my-assets" class="nav-btn active"><i class="fas fa-laptop"></i> My Assets</button>
                 <div class="nav-section-label">Redressal System</div>
-                <button onclick="switchView('report-issue')" id="nav-report-issue" class="nav-btn active"><i class="fas fa-triangle-exclamation"></i> Report Issue</button>
-                <button onclick="switchView('user-tickets')" id="nav-user-tickets" class="nav-btn"><i class="fas fa-list-check"></i> My Tickets</button>
+                <button onclick="switchView('report-issue')" data-view="report-issue" class="nav-btn"><i class="fas fa-triangle-exclamation"></i> Report Issue</button>
+                <button onclick="switchView('user-tickets')" data-view="user-tickets" class="nav-btn"><i class="fas fa-list-check"></i> My Tickets</button>
             </div>
         </nav>
 
@@ -376,17 +329,14 @@
             <button class="hamburger-btn" onclick="document.getElementById('mobile-menu').classList.toggle('show')"><i class="fas fa-bars"></i></button>
         </header>
         
-        <!-- Mobile Menu (Populated dynamically via JS) -->
         <div id="mobile-menu" class="mobile-menu"></div>
 
         <div class="content-scroll" id="content-scroll">
             
+            <!-- Admin Dashboard -->
             <div id="view-dashboard" class="view-layer active">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Dashboard</h2>
-                        <p class="page-sub">Overview of your tracked assets</p>
-                    </div>
+                    <div><h2 class="page-title">Dashboard</h2><p class="page-sub">Overview of your tracked assets</p></div>
                     <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
                 </div>
                 <div class="stat-grid">
@@ -417,16 +367,15 @@
                 </div>
             </div>
 
+            <!-- Admin Asset Directory -->
             <div id="view-assets" class="view-layer">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Asset Directory</h2>
-                        <p class="page-sub" id="list-subtitle">Showing all active assets</p>
-                    </div>
+                    <div><h2 class="page-title">Asset Directory</h2><p class="page-sub" id="list-subtitle">Showing all active assets</p></div>
                     <div style="display:flex;gap:10px;">
                         <button id="clear-filter-btn" onclick="clearAssetFilters()" class="btn btn-ghost hidden"><i class="fas fa-times"></i> Clear Filter</button>
                         <button onclick="exportPDF()" class="btn btn-success"><i class="fas fa-file-pdf"></i> Export</button>
                         <button onclick="switchView('add-asset')" class="btn btn-primary"><i class="fas fa-plus"></i> Add Asset</button>
+                        <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i></button>
                     </div>
                 </div>
                 <div class="table-card">
@@ -434,10 +383,10 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th onclick="sortAssets('name')" style="cursor:pointer">ASSET <i class="fas fa-sort sort-icon" id="sort-name"></i></th>
-                                    <th onclick="sortAssets('assignedName')" style="cursor:pointer">ASSIGNMENT <i class="fas fa-sort sort-icon" id="sort-assignedName"></i></th>
-                                    <th onclick="sortAssets('warrantyDate')" style="cursor:pointer">WARRANTY <i class="fas fa-sort sort-icon" id="sort-warrantyDate"></i></th>
-                                    <th onclick="sortAssets('serviceDate')" style="cursor:pointer">NEXT SERVICE <i class="fas fa-sort sort-icon" id="sort-serviceDate"></i></th>
+                                    <th onclick="sortAssets('name', 'assets')" style="cursor:pointer">ASSET <i class="fas fa-sort sort-icon" id="sort-assets-name"></i></th>
+                                    <th onclick="sortAssets('assignedName', 'assets')" style="cursor:pointer">ASSIGNMENT <i class="fas fa-sort sort-icon" id="sort-assets-assignedName"></i></th>
+                                    <th onclick="sortAssets('warrantyDate', 'assets')" style="cursor:pointer">WARRANTY <i class="fas fa-sort sort-icon" id="sort-assets-warrantyDate"></i></th>
+                                    <th onclick="sortAssets('serviceDate', 'assets')" style="cursor:pointer">NEXT SERVICE <i class="fas fa-sort sort-icon" id="sort-assets-serviceDate"></i></th>
                                     <th>SERVICE PROVIDER</th>
                                     <th>STATUS</th>
                                     <th>DOCUMENTS</th>
@@ -445,8 +394,8 @@
                                 <tr class="filter-row">
                                     <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset..." oninput="renderAssets()"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-assign" placeholder="Name/Dept/Cabin..." oninput="renderAssets()"></th>
-                                    <th><input type="date" class="filter-input-sm" id="filt-war" onchange="renderAssets()" title="Filter by specific date"></th>
-                                    <th><input type="date" class="filter-input-sm" id="filt-svc" onchange="renderAssets()" title="Filter by specific date"></th>
+                                    <th><input type="date" class="filter-input-sm" id="filt-war" onchange="renderAssets()"></th>
+                                    <th><input type="date" class="filter-input-sm" id="filt-svc" onchange="renderAssets()"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-sp" placeholder="Filter Provider..." oninput="renderAssets()"></th>
                                     <th></th>
                                     <th></th>
@@ -463,15 +412,41 @@
                 </div>
             </div>
 
-            <div id="view-add-asset" class="view-layer">
+            <!-- Sub-Admin / User: My Assets -->
+            <div id="view-my-assets" class="view-layer">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Register Asset</h2>
-                        <p class="page-sub">Track new equipment and its assignments</p>
+                    <div><h2 class="page-title">My Assets</h2><p class="page-sub">Equipment currently assigned to you</p></div>
+                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
+                </div>
+                <div class="table-card">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th onclick="sortAssets('name', 'my-assets')" style="cursor:pointer">ASSET <i class="fas fa-sort sort-icon" id="sort-my-assets-name"></i></th>
+                                    <th onclick="sortAssets('warrantyDate', 'my-assets')" style="cursor:pointer">WARRANTY <i class="fas fa-sort sort-icon" id="sort-my-assets-warrantyDate"></i></th>
+                                    <th onclick="sortAssets('serviceDate', 'my-assets')" style="cursor:pointer">NEXT SERVICE <i class="fas fa-sort sort-icon" id="sort-my-assets-serviceDate"></i></th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-asset-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="my-asset-empty" class="empty-state show">
+                        <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+                        <h3 style="font-size:16px;font-weight:600;margin-bottom:4px;">No assets assigned</h3>
+                        <p style="font-size:13px;color:var(--ink-soft);max-width:300px;">You currently don't have any assets assigned to you.</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Add Asset (Admin & Sub-Admin) -->
+            <div id="view-add-asset" class="view-layer">
+                <div class="page-header">
+                    <div><h2 class="page-title">Register Asset</h2><p class="page-sub">Track new equipment and its assignments</p></div>
+                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
+                </div>
                 <form id="add-asset-form">
-                    <!-- Basic & Assignment -->
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-desktop"></i> Asset Details</div>
                         <div class="form-grid form-grid-2">
@@ -482,7 +457,7 @@
                             <div>
                                 <label>Ownership</label>
                                 <select id="ownership" class="input">
-                                    <option value="Owned">Owned</option>
+                                    <option value="Own">Own</option>
                                     <option value="Rented">Rented</option>
                                 </select>
                             </div>
@@ -495,7 +470,8 @@
                             </div>
                             <div>
                                 <label>Assigned Person Name</label>
-                                <input type="text" id="assignedName" class="input" placeholder="John Doe">
+                                <input type="text" id="assignedName" class="input" placeholder="John Doe" list="user-names-list">
+                                <datalist id="user-names-list"></datalist>
                             </div>
                             <div>
                                 <label>Assigned Person Contact</label>
@@ -512,7 +488,6 @@
                         </div>
                     </div>
 
-                    <!-- Dates -->
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-calendar"></i> Important Dates</div>
                         <div class="form-grid form-grid-3">
@@ -522,7 +497,6 @@
                         </div>
                     </div>
 
-                    <!-- Dynamic Service Providers -->
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-headset"></i> Service Providers</div>
                         <div id="sp-container">
@@ -537,7 +511,6 @@
                         <button type="button" class="add-sp-btn" onclick="addSpBlock()"><i class="fas fa-plus"></i> Add Another Provider</button>
                     </div>
 
-                    <!-- Documents -->
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-paperclip"></i> Documents (Max 6MB)</div>
                         <div class="form-grid form-grid-2">
@@ -574,7 +547,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div style="display:flex;gap:12px;justify-content:flex-end;">
                         <button type="button" class="btn btn-ghost" onclick="switchView('assets')">Cancel</button>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Asset</button>
@@ -582,29 +554,20 @@
                 </form>
             </div>
 
+            <!-- Report Issue -->
             <div id="view-report-issue" class="view-layer">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Report an Issue</h2>
-                        <p class="page-sub">Submit a redressal ticket for a faulty asset</p>
-                    </div>
+                    <div><h2 class="page-title">Report an Issue</h2><p class="page-sub">Submit a redressal ticket for a faulty asset</p></div>
+                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
                 </div>
                 <div class="form-card" style="max-width:600px; margin:0 auto;">
                     <form id="ticket-form">
                         <div class="form-grid">
-                            <div>
-                                <label>Your Department <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="tkt-dept" class="input" required placeholder="e.g., HR" oninput="filterAssetsForDropdown()">
-                            </div>
-                            <div>
-                                <label>Cabin / Room Number <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="tkt-cabin" class="input" required placeholder="e.g., A-102" oninput="filterAssetsForDropdown()">
-                            </div>
+                            <div><label>Your Department <span style="color:var(--danger)">*</span></label><input type="text" id="tkt-dept" class="input" required placeholder="e.g., HR" oninput="filterAssetsForDropdown()"></div>
+                            <div><label>Cabin / Room Number <span style="color:var(--danger)">*</span></label><input type="text" id="tkt-cabin" class="input" required placeholder="e.g., A-102" oninput="filterAssetsForDropdown()"></div>
                             <div>
                                 <label>Select Faulty Asset <span style="color:var(--danger)">*</span></label>
-                                <select id="tkt-asset" class="input" required>
-                                    <option value="">-- Enter Dept & Cabin first --</option>
-                                </select>
+                                <select id="tkt-asset" class="input" required><option value="">-- Enter Dept & Cabin first --</option></select>
                             </div>
                             <div>
                                 <label>Describe the Problem <span style="color:var(--danger)">*</span></label>
@@ -631,60 +594,48 @@
                 </div>
             </div>
 
+            <!-- Admin Tickets -->
             <div id="view-admin-tickets" class="view-layer">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Ticket Management</h2>
-                        <p class="page-sub">Resolve user issues</p>
-                    </div>
-                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i></button>
+                    <div><h2 class="page-title">Ticket Management</h2><p class="page-sub">Resolve user issues</p></div>
+                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
                 </div>
                 <div class="table-card">
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr><th>TICKET ID</th><th>DATE</th><th>REPORTED BY</th><th>LOCATION</th><th>ASSET</th><th>ISSUE</th><th>STATUS</th><th>ACTION</th></tr>
-                            </thead>
+                            <thead><tr><th>TICKET ID</th><th>DATE</th><th>REPORTED BY</th><th>LOCATION</th><th>ASSET</th><th>ISSUE / DETAILS</th><th>STATUS</th><th>ACTION</th></tr></thead>
                             <tbody id="admin-ticket-body"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- User Tickets -->
             <div id="view-user-tickets" class="view-layer">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">My Tickets</h2>
-                        <p class="page-sub">Status of your reported issues</p>
-                    </div>
-                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i></button>
+                    <div><h2 class="page-title">My Tickets</h2><p class="page-sub">Status of your reported issues</p></div>
+                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
                 </div>
                 <div class="table-card">
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr><th>TICKET ID</th><th>DATE</th><th>LOCATION</th><th>ASSET</th><th>ISSUE</th><th>STATUS</th><th>PROOFS</th></tr>
-                            </thead>
+                            <thead><tr><th>TICKET ID</th><th>DATE</th><th>LOCATION</th><th>ASSET</th><th>ISSUE</th><th>STATUS</th><th>PROOFS</th></tr></thead>
                             <tbody id="user-ticket-body"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- Admin Users -->
             <div id="view-admin-users" class="view-layer">
                 <div class="page-header">
-                    <div>
-                        <h2 class="page-title">User Management</h2>
-                        <p class="page-sub">Manage roles and access</p>
-                    </div>
-                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i></button>
+                    <div><h2 class="page-title">User Management</h2><p class="page-sub">Manage roles and access</p></div>
+                    <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
                 </div>
                 <div class="table-card">
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr><th>USER ID</th><th>NAME</th><th>ROLE</th><th>STATUS</th><th>ACTIONS</th></tr>
-                            </thead>
+                            <thead><tr><th>USER ID</th><th>NAME</th><th>ROLE</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
                             <tbody id="user-table-body"></tbody>
                         </table>
                     </div>
@@ -695,7 +646,7 @@
     </div>
 </div>
 
-<!-- Doc Viewer Modal -->
+<!-- Dynamic Doc Viewer Modal -->
 <div class="modal-wrap" id="doc-modal">
     <div class="modal-backdrop" onclick="closeModal('doc-modal')"></div>
     <div class="modal-box">
@@ -704,9 +655,8 @@
             <button class="modal-close" onclick="closeModal('doc-modal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body" style="padding:0; overflow:hidden;">
-            <div style="display:flex;gap:4px;padding:12px;background:var(--surface);border-bottom:1px solid var(--border);">
-                <button class="btn btn-primary" id="btn-tab-photo" onclick="showIframe('photo')" style="flex:1"><i class="fas fa-image"></i> Photo/Proof</button>
-                <button class="btn btn-ghost" id="btn-tab-bill" onclick="showIframe('bill')" style="flex:1"><i class="fas fa-file-invoice"></i> Bill</button>
+            <div id="doc-tabs-header" style="display:flex;gap:4px;padding:12px;background:var(--surface);border-bottom:1px solid var(--border); overflow-x:auto;">
+                <!-- Dynamic Buttons generated here -->
             </div>
             <div style="flex:1; background:#e5e7eb; position:relative; min-height:400px;">
                 <iframe id="doc-iframe" style="width:100%;height:100%;border:0;position:absolute;inset:0;"></iframe>
@@ -738,6 +688,28 @@
                     <button type="button" class="dz-remove" onclick="removeFile('proof')"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
+            
+            <!-- EXCLUSIVE ADMIN FIELDS -->
+            <div id="admin-resolve-fields" class="admin-only" style="margin-top: 16px; border-top: 1px solid var(--border); padding-top:16px;">
+                <label>Repair Cost ($) <span style="font-size:11px;color:#9ca3af;font-weight:normal">(Admin Only)</span></label>
+                <input type="number" id="resolve-cost" class="input" placeholder="e.g. 150.00" style="margin-bottom:12px;">
+                
+                <label>Repair Bill (PDF/Image - Max 6MB) <span style="font-size:11px;color:#9ca3af;font-weight:normal">(Admin Only)</span></label>
+                <div class="dropzone" id="dz-repairBill" style="min-height:90px;">
+                    <div class="dz-content" id="dz-repairBill-init">
+                        <i class="fas fa-file-invoice dz-icon" style="font-size:20px;"></i><br>
+                        <label for="upload-repairBill" class="dz-link">Click to upload repair bill</label>
+                        <input type="file" id="upload-repairBill" class="hidden" accept="image/*,application/pdf">
+                    </div>
+                    <div class="dz-preview" id="dz-repairBill-prev">
+                        <img id="dz-repairBill-img" class="dz-thumb" src="" style="display:none">
+                        <div class="dz-thumb" id="dz-repairBill-icon" style="display:none;align-items:center;justify-content:center;background:var(--surface-2);color:var(--accent);"><i class="fas fa-file-pdf"></i></div>
+                        <div class="dz-file-name" id="dz-repairBill-name"></div>
+                        <button type="button" class="dz-remove" onclick="removeFile('repairBill')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+
             <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:16px;">
                 <button class="btn btn-ghost" onclick="closeModal('resolve-modal')">Cancel</button>
                 <button class="btn btn-success" onclick="submitResolution()"><i class="fas fa-check"></i> Mark Resolved</button>
@@ -750,20 +722,15 @@
     // ==========================================
     // DEPLOYMENT: REPLACE THIS URL WITH YOUR NEW APPS SCRIPT WEB APP URL
     // ==========================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzf99pu58dIPdIk51iPbmbkXYJz50RXlvElzGyKKyWIYUMEuJBmgJSWd4sSNKJJvrWUPw/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFemg7qdLobadG-7wQ1kMWd7Hx_5bbba-jVvzZGSQgAnSYJE1_6BVFijJcHQWtyV2HpQ/exec'; 
 
-    // App State
-    let currentUser = null; // { userId, name, role }
+    let currentUser = null; 
     let appData = { assets: [], tickets: [], users: [] };
-    let filesData = { photo: '', bill: '', proof: '', issueProof: '' };
-    let sortConfig = { key: null, dir: 'asc' };
-    let currentModalAssetUrls = { photo: '', bill: '' };
+    let filesData = { photo: '', bill: '', proof: '', issueProof: '', repairBill: '' };
+    let sortConfig = { table: null, key: null, dir: 'asc' };
+    let currentModalAssetUrls = {};
 
-    // --- UI Helpers ---
-    function showLoading(msg = 'Loading...') {
-        document.getElementById('loader-text').innerText = msg;
-        document.getElementById('global-loader').classList.remove('hidden');
-    }
+    function showLoading(msg = 'Loading...') { document.getElementById('loader-text').innerText = msg; document.getElementById('global-loader').classList.remove('hidden'); }
     function hideLoading() { document.getElementById('global-loader').classList.add('hidden'); }
     function showToast(msg, type = 'success') {
         const t = document.createElement('div');
@@ -773,39 +740,28 @@
         setTimeout(() => { t.style.opacity=0; t.style.transform='translateY(10px)'; t.style.transition='0.3s'; setTimeout(()=>t.remove(),300); }, 3000);
     }
 
-    // --- Auth Logic ---
     function toggleAuth(view) {
         document.getElementById('login-card').classList.toggle('hidden', view !== 'login');
         document.getElementById('register-card').classList.toggle('hidden', view !== 'register');
     }
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading('Signing in...');
+        e.preventDefault(); showLoading('Signing in...');
         const err = document.getElementById('login-error'); err.style.display = 'none';
         try {
-            const res = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', userId: document.getElementById('login-userId').value, password: document.getElementById('login-password').value })
-            });
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', userId: document.getElementById('login-userId').value, password: document.getElementById('login-password').value }) });
             const data = await res.json();
-            if (data.success) {
-                currentUser = data.user;
-                setupEnvironment();
-            } else { err.style.display = 'block'; document.getElementById('login-error-text').innerText = data.message; }
+            if (data.success) { currentUser = data.user; setupEnvironment(); } 
+            else { err.style.display = 'block'; document.getElementById('login-error-text').innerText = data.message; }
         } catch(e) { err.style.display='block'; document.getElementById('login-error-text').innerText = 'Network error'; }
         hideLoading();
     });
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading('Registering...');
+        e.preventDefault(); showLoading('Registering...');
         const err = document.getElementById('reg-error'); err.style.display = 'none';
         try {
-            const res = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'register', name: document.getElementById('reg-name').value, userId: document.getElementById('reg-userId').value, password: document.getElementById('reg-password').value })
-            });
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'register', name: document.getElementById('reg-name').value, userId: document.getElementById('reg-userId').value, password: document.getElementById('reg-password').value }) });
             const data = await res.json();
             if (data.success) { showToast('Registration successful! Please login.'); toggleAuth('login'); document.getElementById('register-form').reset(); }
             else { err.style.display = 'block'; document.getElementById('reg-error-text').innerText = data.message; }
@@ -820,39 +776,43 @@
         document.getElementById('auth-view').classList.remove('hidden');
     }
 
-    // --- Core Environment Setup ---
     function setupEnvironment() {
         document.getElementById('auth-view').classList.add('hidden');
         document.getElementById('app-view').classList.remove('hidden');
         
-        // Setup Sidebar User Profile
         document.getElementById('sidebar-name').innerText = currentUser.name;
         document.getElementById('sidebar-role').innerText = currentUser.role;
         document.getElementById('sidebar-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
 
-        // Setup Sidebar Links based on role
         const isAdmin = currentUser.role === 'Admin';
+        const isSubAdmin = currentUser.role === 'Sub-Admin';
+        
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
-        document.querySelectorAll('.user-only').forEach(el => el.style.display = !isAdmin ? 'block' : 'none');
+        document.querySelectorAll('.sub-admin-only').forEach(el => el.style.display = isSubAdmin ? 'block' : 'none');
+        document.querySelectorAll('.non-admin').forEach(el => el.style.display = !isAdmin ? 'block' : 'none');
 
-        // Populate Mobile Menu with same logic
         const mobMenu = document.getElementById('mobile-menu');
         mobMenu.innerHTML = '';
         if(isAdmin) {
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>`;
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('assets')"><i class="fas fa-list-ul"></i> All Assets</button>`;
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('add-asset')"><i class="fas fa-plus"></i> Add Asset</button>`;
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('admin-tickets')"><i class="fas fa-ticket-alt"></i> All Tickets</button>`;
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('admin-users')"><i class="fas fa-users"></i> Users</button>`;
+            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('assets')"><i class="fas fa-list-ul"></i> All Assets</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('add-asset')"><i class="fas fa-plus"></i> Add Asset</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('admin-tickets')"><i class="fas fa-ticket-alt"></i> All Tickets</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('admin-users')"><i class="fas fa-users"></i> Users</button>`;
+        } else if (isSubAdmin) {
+            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('add-asset')"><i class="fas fa-plus"></i> Add Asset</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('my-assets')"><i class="fas fa-laptop"></i> My Assets</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('report-issue')"><i class="fas fa-triangle-exclamation"></i> Report Issue</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('user-tickets')"><i class="fas fa-list-check"></i> My Tickets</button>`;
         } else {
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('report-issue')"><i class="fas fa-triangle-exclamation"></i> Report Issue</button>`;
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('user-tickets')"><i class="fas fa-list-check"></i> My Tickets</button>`;
+            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('my-assets')"><i class="fas fa-laptop"></i> My Assets</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('report-issue')"><i class="fas fa-triangle-exclamation"></i> Report Issue</button>
+                                  <button class="mobile-nav-btn" onclick="switchView('user-tickets')"><i class="fas fa-list-check"></i> My Tickets</button>`;
         }
         mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="logout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt" style="color:var(--danger)"></i> Sign Out</button>`;
 
-        // Fetch Initial Data
         fetchData();
-        switchView(isAdmin ? 'dashboard' : 'report-issue');
+        switchView(isAdmin ? 'dashboard' : 'my-assets');
     }
 
     function switchView(viewId) {
@@ -862,13 +822,13 @@
         const layer = document.getElementById('view-' + viewId);
         if(layer) layer.classList.add('active');
         
-        const nav = document.getElementById('nav-' + viewId);
-        if(nav) nav.classList.add('active');
+        document.querySelectorAll(`[data-view="${viewId}"]`).forEach(el => el.classList.add('active'));
         
         document.getElementById('mobile-menu').classList.remove('show');
         document.getElementById('content-scroll').scrollTo(0,0);
 
         if(viewId === 'assets') renderAssets();
+        if(viewId === 'my-assets') renderMyAssets();
         if(viewId === 'admin-tickets' || viewId === 'user-tickets') renderTickets();
         if(viewId === 'admin-users') renderUsers();
         if(viewId === 'report-issue') filterAssetsForDropdown();
@@ -877,7 +837,7 @@
     async function fetchData() {
         showLoading('Syncing data...');
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=getAppData&role=${currentUser.role}&userId=${encodeURIComponent(currentUser.userId)}`);
+            const res = await fetch(`${SCRIPT_URL}?action=getAppData&role=${currentUser.role}&userId=${encodeURIComponent(currentUser.userId)}&userName=${encodeURIComponent(currentUser.name)}`);
             const result = await res.json();
             if (result.success) {
                 appData = {
@@ -885,8 +845,17 @@
                     tickets: result.tickets || [],
                     users: result.users || []
                 };
+                
+                // Populate user suggestions for Add Asset form
+                const dl = document.getElementById('user-names-list');
+                if (dl) {
+                    dl.innerHTML = '';
+                    appData.users.forEach(u => dl.innerHTML += `<option value="${u.name}">`);
+                }
+
                 if(currentUser.role === 'Admin') updateDashboard();
                 if (document.getElementById('view-assets').classList.contains('active')) renderAssets();
+                if (document.getElementById('view-my-assets').classList.contains('active')) renderMyAssets();
                 if (document.getElementById('view-admin-tickets').classList.contains('active') || document.getElementById('view-user-tickets').classList.contains('active')) renderTickets();
                 if (document.getElementById('view-admin-users').classList.contains('active')) renderUsers();
                 if (document.getElementById('view-report-issue').classList.contains('active')) filterAssetsForDropdown();
@@ -909,14 +878,19 @@
         document.getElementById('stat-tickets').innerText = open;
     }
 
-    function sortAssets(key) {
-        if(sortConfig.key === key) { sortConfig.dir = sortConfig.dir === 'asc' ? 'desc' : 'asc'; }
-        else { sortConfig.key = key; sortConfig.dir = 'asc'; }
+    function sortAssets(key, targetTable) {
+        if(sortConfig.table === targetTable && sortConfig.key === key) { 
+            sortConfig.dir = sortConfig.dir === 'asc' ? 'desc' : 'asc'; 
+        } else { 
+            sortConfig.table = targetTable; sortConfig.key = key; sortConfig.dir = 'asc'; 
+        }
         
         document.querySelectorAll('.sort-icon').forEach(el => el.className = 'fas fa-sort sort-icon');
-        const icon = document.getElementById(`sort-${key}`);
+        const icon = document.getElementById(`sort-${targetTable}-${key}`);
         if(icon) icon.className = `fas fa-sort-${sortConfig.dir==='asc'?'up':'down'} sort-icon active`;
-        renderAssets();
+        
+        if(targetTable === 'assets') renderAssets();
+        else if (targetTable === 'my-assets') renderMyAssets();
     }
 
     function clearAssetFilters() {
@@ -932,29 +906,95 @@
 
     function filterAssets(quickFilter) {
         clearAssetFilters();
-        // Since we changed filter to specific date pickers, we'll navigate but leave generic message for quick filters 
-        // Quick filters here used to set `<select>` value to 'due'. Now it just navigates and displays a tag.
         if(quickFilter === 'service') { document.getElementById('list-subtitle').innerText = 'Filtered: Service due soon (Showing all for full context)'; }
         if(quickFilter === 'warranty') { document.getElementById('list-subtitle').innerText = 'Filtered: Warranty ending soon (Showing all for full context)'; }
         document.getElementById('clear-filter-btn').classList.remove('hidden');
         switchView('assets');
     }
-    
+
+    // Common function to format rows
+    function createAssetRowHTML(a, isMyAssetsView = false) {
+        let daysWar = null;
+        if(a.warrantyDate && !isNaN(new Date(a.warrantyDate))) daysWar = Math.ceil((new Date(a.warrantyDate) - new Date()) / 86400000);
+        const wCls = daysWar === null ? 'badge-neutral' : (daysWar < 0 ? 'badge-danger' : (daysWar <= 30 ? 'badge-warning' : 'badge-valid'));
+        const wTxt = daysWar === null ? 'N/A' : (daysWar < 0 ? 'Overdue' : (daysWar <= 30 ? `Due ${daysWar}d` : 'Valid'));
+        
+        let daysSvc = null;
+        if(a.serviceDate && !isNaN(new Date(a.serviceDate))) daysSvc = Math.ceil((new Date(a.serviceDate) - new Date()) / 86400000);
+        const sCls = daysSvc === null ? 'badge-neutral' : (daysSvc < 0 ? 'badge-danger' : (daysSvc <= 30 ? 'badge-warning' : 'badge-valid'));
+        const sTxt = daysSvc === null ? 'N/A' : (daysSvc < 0 ? 'Overdue' : (daysSvc <= 30 ? `Due ${daysSvc}d` : 'Valid'));
+
+        const spList = String(a.spName || '').split(' | '); 
+        const spCon = String(a.spContact || '').split(' | '); 
+        const spAdd = String(a.spAddress || '').split(' | ');
+        let spHTML = '';
+        for(let i=0; i<spList.length; i++) {
+            if(!spList[i]) continue;
+            spHTML += `<div style="margin-bottom:${i < spList.length-1 ? '8px' : '0'}; padding-bottom:${i < spList.length-1 ? '8px' : '0'}; border-bottom:${i < spList.length-1 ? '1px solid var(--border)' : 'none'};">
+                        <div style="font-weight:600;font-size:13px;">${spList[i]}</div>
+                        <div style="color:var(--ink-soft);font-size:12px;"><i class="fas fa-phone" style="font-size:10px;margin-right:4px"></i>${spCon[i] || '—'}</div>
+                        <div style="color:var(--ink-soft);font-size:12px;margin-top:2px;"><i class="fas fa-map-marker-alt" style="font-size:10px;margin-right:4px"></i>${spAdd[i] || '—'}</div>
+                    </div>`;
+        }
+
+        const formatD = d => d && !isNaN(new Date(d)) ? new Date(d).toLocaleDateString() : '—';
+        const safeA = (a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) ? a.photoData : '';
+        const safeB = (a.billData && a.billData.length > 5 && !a.billData.startsWith('ERROR')) ? a.billData : '';
+        const docBtn = safeA || safeB 
+            ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="viewAssetDocs('${a.id}')"><i class="fas fa-folder-open"></i> View</button>`
+            : `<span style="font-size:12px;color:#9ca3af">No docs</span>`;
+
+        let html = `
+            <td>
+                <div style="font-weight:600">${a.name||'—'} <span class="badge ${a.ownership==='Rented'?'badge-warning':'badge-neutral'}" style="font-size:9px;margin-left:4px;">${a.ownership||'Own'}</span></div>
+                <div style="font-size:12px;color:var(--ink-soft)">Purchased: ${formatD(a.purchaseDate)}</div>
+            </td>`;
+            
+        if(!isMyAssetsView) {
+            html += `
+            <td>
+                <div style="font-weight:500;font-size:13px"><i class="fas fa-user" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedName || 'Unassigned'}</div>
+                <div style="font-size:12px;color:var(--ink-soft)"><i class="fas fa-building" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedDept||'—'} | Cabin: ${a.cabinNumber||'—'}</div>
+                <div style="font-size:12px;color:var(--ink-soft)"><i class="fas fa-phone" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedContact||'—'}</div>
+            </td>`;
+        }
+        
+        // Status dropdown for Admin/Sub-Admin, badge for users
+        let statusHtml = '';
+        if(currentUser.role === 'User') {
+             statusHtml = `<span class="badge ${a.status==='Non-Working'?'badge-danger':'badge-valid'}">${a.status || 'Working'}</span>`;
+        } else {
+             statusHtml = `<select class="input" style="padding:4px 8px;width:auto; ${a.status==='Non-Working'?'color:var(--danger);font-weight:bold;':''}" onchange="updateAsset('${a.id}', 'status', this.value)">
+                    <option value="Working" ${a.status!=='Non-Working'?'selected':''}>Working</option>
+                    <option value="Non-Working" ${a.status==='Non-Working'?'selected':''}>Non-Working</option>
+                </select>`;
+        }
+
+        html += `
+            <td><span class="badge ${wCls}">${wTxt}</span><div style="font-size:11px;margin-top:4px;color:#6b7280">${formatD(a.warrantyDate)}</div></td>
+            <td><span class="badge ${sCls}">${sTxt}</span><div style="font-size:11px;margin-top:4px;color:#6b7280">${formatD(a.serviceDate)}</div></td>`;
+            
+        if(!isMyAssetsView) {
+            html += `<td>${spHTML || '<span style="color:#9ca3af;font-size:12px">No Provider</span>'}</td>`;
+        }
+        
+        html += `<td>${statusHtml}</td>`;
+        
+        if(!isMyAssetsView) {
+            html += `<td>${docBtn}</td>`;
+        }
+
+        return html;
+    }
+
     function renderAssets() {
         let data = (appData.assets || []).filter(a => typeof a === 'object' && a !== null);
         
-        // Read filters safely
-        const filtAsset = document.getElementById('filt-asset');
-        const filtAssign = document.getElementById('filt-assign');
-        const filtSp = document.getElementById('filt-sp');
-        const filtWar = document.getElementById('filt-war'); // Now an exact date string YYYY-MM-DD
-        const filtSvc = document.getElementById('filt-svc'); // Now an exact date string YYYY-MM-DD
-
-        const fAst = filtAsset ? filtAsset.value.toLowerCase() : '';
-        const fAsg = filtAssign ? filtAssign.value.toLowerCase() : '';
-        const fSp  = filtSp ? filtSp.value.toLowerCase() : '';
-        const fWar = filtWar ? filtWar.value : '';
-        const fSvc = filtSvc ? filtSvc.value : '';
+        const fAst = document.getElementById('filt-asset') ? document.getElementById('filt-asset').value.toLowerCase() : '';
+        const fAsg = document.getElementById('filt-assign') ? document.getElementById('filt-assign').value.toLowerCase() : '';
+        const fSp  = document.getElementById('filt-sp') ? document.getElementById('filt-sp').value.toLowerCase() : '';
+        const fWar = document.getElementById('filt-war') ? document.getElementById('filt-war').value : '';
+        const fSvc = document.getElementById('filt-svc') ? document.getElementById('filt-svc').value : '';
         
         if(fAst || fAsg || fSp || fWar || fSvc) document.getElementById('clear-filter-btn').classList.remove('hidden');
         else document.getElementById('clear-filter-btn').classList.add('hidden');
@@ -967,21 +1007,15 @@
             if(fAst && !nameStr.includes(fAst)) return false;
             if(fAsg && !assignStr.includes(fAsg)) return false;
             if(fSp && !spStr.includes(fSp)) return false;
-            
-            // Exact Date Filtering
             if(fWar && a.warrantyDate !== fWar) return false;
             if(fSvc && a.serviceDate !== fSvc) return false;
-
             return true;
         });
 
-        if(sortConfig.key) {
+        if(sortConfig.table === 'assets' && sortConfig.key) {
             data.sort((a,b) => {
                 let vA = a[sortConfig.key] || ''; let vB = b[sortConfig.key] || '';
-                if(sortConfig.key.includes('Date')) { 
-                    vA = vA && !isNaN(new Date(vA)) ? new Date(vA).getTime() : 0; 
-                    vB = vB && !isNaN(new Date(vB)) ? new Date(vB).getTime() : 0; 
-                }
+                if(sortConfig.key.includes('Date')) { vA = vA && !isNaN(new Date(vA)) ? new Date(vA).getTime() : 0; vB = vB && !isNaN(new Date(vB)) ? new Date(vB).getTime() : 0; }
                 else { vA = vA.toString().toLowerCase(); vB = vB.toString().toLowerCase(); }
                 if(vA < vB) return sortConfig.dir === 'asc' ? -1 : 1;
                 if(vA > vB) return sortConfig.dir === 'asc' ? 1 : -1;
@@ -989,81 +1023,45 @@
             });
         }
 
-        const tbody = document.getElementById('asset-table-body'); 
-        if(!tbody) return;
+        const tbody = document.getElementById('asset-table-body'); if(!tbody) return;
         tbody.innerHTML = '';
-        
         const emptyState = document.getElementById('asset-empty');
-        if(data.length === 0) { 
-            emptyState.classList.add('show'); 
-            return; 
-        } else {
-            emptyState.classList.remove('show');
-        }
+        
+        if(data.length === 0) { emptyState.classList.add('show'); return; } 
+        else { emptyState.classList.remove('show'); }
 
         data.forEach(a => {
             const tr = document.createElement('tr');
-            
-            // Warranty Calc
-            let daysWar = null;
-            if(a.warrantyDate && !isNaN(new Date(a.warrantyDate))) {
-                 daysWar = Math.ceil((new Date(a.warrantyDate) - new Date()) / 86400000);
-            }
-            const wCls = daysWar === null ? 'badge-neutral' : (daysWar < 0 ? 'badge-danger' : (daysWar <= 30 ? 'badge-warning' : 'badge-valid'));
-            const wTxt = daysWar === null ? 'N/A' : (daysWar < 0 ? 'Overdue' : (daysWar <= 30 ? `Due ${daysWar}d` : 'Valid'));
-            
-            // Service Calc
-            let daysSvc = null;
-            if(a.serviceDate && !isNaN(new Date(a.serviceDate))) {
-                 daysSvc = Math.ceil((new Date(a.serviceDate) - new Date()) / 86400000);
-            }
-            const sCls = daysSvc === null ? 'badge-neutral' : (daysSvc < 0 ? 'badge-danger' : (daysSvc <= 30 ? 'badge-warning' : 'badge-valid'));
-            const sTxt = daysSvc === null ? 'N/A' : (daysSvc < 0 ? 'Overdue' : (daysSvc <= 30 ? `Due ${daysSvc}d` : 'Valid'));
+            tr.innerHTML = createAssetRowHTML(a, false);
+            tbody.appendChild(tr);
+        });
+    }
 
-            const spList = String(a.spName || '').split(' | '); 
-            const spCon = String(a.spContact || '').split(' | '); 
-            const spAdd = String(a.spAddress || '').split(' | ');
-            
-            let spHTML = '';
-            for(let i=0; i<spList.length; i++) {
-                if(!spList[i]) continue;
-                spHTML += `
-                    <div style="margin-bottom:${i < spList.length-1 ? '8px' : '0'}; padding-bottom:${i < spList.length-1 ? '8px' : '0'}; border-bottom:${i < spList.length-1 ? '1px solid var(--border)' : 'none'};">
-                        <div style="font-weight:600;font-size:13px;">${spList[i]}</div>
-                        <div style="color:var(--ink-soft);font-size:12px;"><i class="fas fa-phone" style="font-size:10px;margin-right:4px"></i>${spCon[i] || '—'}</div>
-                        <div style="color:var(--ink-soft);font-size:12px;margin-top:2px;"><i class="fas fa-map-marker-alt" style="font-size:10px;margin-right:4px"></i>${spAdd[i] || '—'}</div>
-                    </div>`;
-            }
+    function renderMyAssets() {
+        // Backend filters assets automatically based on user role (sub-admin & user only get their own)
+        let data = (appData.assets || []).filter(a => typeof a === 'object' && a !== null);
+        
+        if(sortConfig.table === 'my-assets' && sortConfig.key) {
+            data.sort((a,b) => {
+                let vA = a[sortConfig.key] || ''; let vB = b[sortConfig.key] || '';
+                if(sortConfig.key.includes('Date')) { vA = vA && !isNaN(new Date(vA)) ? new Date(vA).getTime() : 0; vB = vB && !isNaN(new Date(vB)) ? new Date(vB).getTime() : 0; }
+                else { vA = vA.toString().toLowerCase(); vB = vB.toString().toLowerCase(); }
+                if(vA < vB) return sortConfig.dir === 'asc' ? -1 : 1;
+                if(vA > vB) return sortConfig.dir === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
 
-            const formatD = d => d && !isNaN(new Date(d)) ? new Date(d).toLocaleDateString() : '—';
-            const safeA = (a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) ? a.photoData : '';
-            const safeB = (a.billData && a.billData.length > 5 && !a.billData.startsWith('ERROR')) ? a.billData : '';
+        const tbody = document.getElementById('my-asset-table-body'); if(!tbody) return;
+        tbody.innerHTML = '';
+        const emptyState = document.getElementById('my-asset-empty');
+        
+        if(data.length === 0) { emptyState.classList.add('show'); return; } 
+        else { emptyState.classList.remove('show'); }
 
-            tr.innerHTML = `
-                <td>
-                    <div style="font-weight:600">${a.name||'—'} <span class="badge ${a.ownership==='Rented'?'badge-warning':'badge-neutral'}" style="font-size:9px;margin-left:4px;">${a.ownership||'Owned'}</span></div>
-                    <div style="font-size:12px;color:var(--ink-soft)">Purchased: ${formatD(a.purchaseDate)}</div>
-                </td>
-                <td>
-                    <div style="font-weight:500;font-size:13px"><i class="fas fa-user" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedName || 'Unassigned'}</div>
-                    <div style="font-size:12px;color:var(--ink-soft)"><i class="fas fa-building" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedDept||'—'} | Cabin: ${a.cabinNumber||'—'}</div>
-                    <div style="font-size:12px;color:var(--ink-soft)"><i class="fas fa-phone" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedContact||'—'}</div>
-                </td>
-                <td><span class="badge ${wCls}">${wTxt}</span><div style="font-size:11px;margin-top:4px;color:#6b7280">${formatD(a.warrantyDate)}</div></td>
-                <td><span class="badge ${sCls}">${sTxt}</span><div style="font-size:11px;margin-top:4px;color:#6b7280">${formatD(a.serviceDate)}</div></td>
-                <td>${spHTML || '<span style="color:#9ca3af;font-size:12px">No Provider</span>'}</td>
-                <td>
-                    <select class="input" style="padding:4px 8px;width:auto; ${a.status==='Non-Working'?'color:var(--danger);font-weight:bold;':''}" onchange="updateAsset('${a.id}', 'status', this.value)">
-                        <option value="Working" ${a.status!=='Non-Working'?'selected':''}>Working</option>
-                        <option value="Non-Working" ${a.status==='Non-Working'?'selected':''}>Non-Working</option>
-                    </select>
-                </td>
-                <td>
-                    ${safeA || safeB 
-                        ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="openDocModal('${safeA}', '${safeB}')"><i class="fas fa-folder-open"></i> View</button>`
-                        : `<span style="font-size:12px;color:#9ca3af">No docs</span>`}
-                </td>
-            `;
+        data.forEach(a => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = createAssetRowHTML(a, true);
             tbody.appendChild(tr);
         });
     }
@@ -1071,10 +1069,7 @@
     async function updateAsset(assetId, field, value) {
         showLoading('Updating asset...');
         try {
-            const res = await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'updateAsset', id: assetId, field: field, value: value }) 
-            });
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateAsset', id: assetId, field: field, value: value }) });
             const data = await res.json();
             if(data.success) showToast('Asset updated');
             else showToast('Update failed','error');
@@ -1086,14 +1081,12 @@
         const container = document.getElementById('sp-container');
         const block = document.createElement('div');
         block.className = 'sp-block';
-        block.innerHTML = `
-            <button type="button" class="remove-sp-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            <div class="form-grid form-grid-2">
-                <div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="Name"></div>
-                <div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="Phone"></div>
-                <div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="Address"></div>
-            </div>
-        `;
+        block.innerHTML = `<button type="button" class="remove-sp-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                           <div class="form-grid form-grid-2">
+                               <div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="Name"></div>
+                               <div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="Phone"></div>
+                               <div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="Address"></div>
+                           </div>`;
         container.appendChild(block);
     }
 
@@ -1104,13 +1097,11 @@
         });
     }
 
-    // Increased Max Size to 6MB
-    ['photo', 'bill', 'proof', 'issueProof'].forEach(type => {
+    ['photo', 'bill', 'proof', 'issueProof', 'repairBill'].forEach(type => {
         const input = document.getElementById(`upload-${type}`);
         if(input) {
             input.addEventListener('change', async function() {
                 const file = this.files[0]; if(!file) return;
-                // Limit to 6MB
                 if(file.size > 6*1024*1024) return showToast('File too large (Max 6MB)','error');
                 
                 try {
@@ -1123,9 +1114,9 @@
                     const img = document.getElementById(`dz-${type}-img`);
                     if(file.type.startsWith('image/')) {
                         img.src = filesData[type]; img.style.display = 'block';
-                        if(type === 'bill') document.getElementById('dz-bill-icon').style.display='none';
-                    } else if (type === 'bill') {
-                        img.style.display = 'none'; document.getElementById('dz-bill-icon').style.display='flex';
+                        if(document.getElementById(`dz-${type}-icon`)) document.getElementById(`dz-${type}-icon`).style.display='none';
+                    } else if (document.getElementById(`dz-${type}-icon`)) {
+                        img.style.display = 'none'; document.getElementById(`dz-${type}-icon`).style.display='flex';
                     }
                 } catch(e) { showToast('Error reading file','error'); }
             });
@@ -1140,9 +1131,16 @@
     }
 
     document.getElementById('add-asset-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading('Saving Asset...');
+        e.preventDefault(); showLoading('Saving Asset...');
         
+        // Smart matching logic for Assigned Name (Auto-corrects "Sumit Sir" to "Sumit")
+        let finalAssignedName = document.getElementById('assignedName').value.trim();
+        if (finalAssignedName && appData.users.length > 0) {
+            const typedFirst = finalAssignedName.toLowerCase().split(/\s+/)[0];
+            const match = appData.users.find(u => u.name.toLowerCase().split(/\s+/)[0] === typedFirst);
+            if (match) finalAssignedName = match.name;
+        }
+
         let names=[], contacts=[], addresses=[];
         document.querySelectorAll('.sp-block').forEach(b => {
             const n = b.querySelector('.sp-name').value.trim();
@@ -1156,7 +1154,7 @@
             name: document.getElementById('assetName').value,
             ownership: document.getElementById('ownership').value,
             status: document.getElementById('status').value,
-            assignedName: document.getElementById('assignedName').value,
+            assignedName: finalAssignedName,
             assignedContact: document.getElementById('assignedContact').value,
             assignedDept: document.getElementById('assignedDept').value,
             cabinNumber: document.getElementById('cabinNumber').value,
@@ -1176,9 +1174,8 @@
             if(data.success) {
                 showToast('Asset saved successfully!');
                 e.target.reset(); removeFile('photo'); removeFile('bill');
-                const spCont = document.getElementById('sp-container');
-                spCont.innerHTML = `<div class="sp-block"><div class="form-grid form-grid-2"><div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="ABC Electronics"></div><div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="1800-123-456"></div><div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="123 Tech Lane, City"></div></div></div>`;
-                fetchData(); switchView('assets');
+                document.getElementById('sp-container').innerHTML = `<div class="sp-block"><div class="form-grid form-grid-2"><div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="ABC Electronics"></div><div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="1800-123-456"></div><div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="123 Tech Lane, City"></div></div></div>`;
+                fetchData(); switchView(currentUser.role === 'Admin' ? 'assets' : 'my-assets');
             } else showToast('Error saving asset','error');
         } catch(e) { showToast('Network Error','error'); }
         hideLoading();
@@ -1203,8 +1200,7 @@
     }
 
     document.getElementById('ticket-form').addEventListener('submit', async(e) => {
-        e.preventDefault();
-        showLoading('Submitting ticket...');
+        e.preventDefault(); showLoading('Submitting ticket...');
         const payload = {
             action: 'submitTicket',
             reportedBy: currentUser.userId,
@@ -1217,14 +1213,30 @@
         try {
             const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
-            if(data.success) {
-                showToast('Ticket submitted!');
-                e.target.reset(); removeFile('issueProof');
-                fetchData(); switchView('user-tickets');
-            } else showToast('Error submitting','error');
+            if(data.success) { showToast('Ticket submitted!'); e.target.reset(); removeFile('issueProof'); fetchData(); switchView('user-tickets'); } 
+            else showToast('Error submitting','error');
         } catch(e) { showToast('Network Error','error'); }
         hideLoading();
     });
+
+    function viewTicketDocs(ticketId) {
+        const t = appData.tickets.find(x => x.id === ticketId);
+        if(!t) return;
+        let docs = [];
+        if(t.issueProof && t.issueProof.length > 5) docs.push({name: 'Issue Proof', url: t.issueProof, icon: 'fa-camera'});
+        if(t.resolutionProof && t.resolutionProof.length > 5) docs.push({name: 'Resolution', url: t.resolutionProof, icon: 'fa-image'});
+        if(t.repairBill && t.repairBill.length > 5) docs.push({name: 'Repair Bill', url: t.repairBill, icon: 'fa-file-invoice'});
+        openDocModal(docs);
+    }
+    
+    function viewAssetDocs(assetId) {
+        const a = appData.assets.find(x => x.id === assetId);
+        if(!a) return;
+        let docs = [];
+        if(a.photoData && a.photoData.length > 5) docs.push({name: 'Photo', url: a.photoData, icon: 'fa-image'});
+        if(a.billData && a.billData.length > 5) docs.push({name: 'Invoice', url: a.billData, icon: 'fa-file-invoice'});
+        openDocModal(docs);
+    }
 
     function renderTickets() {
         const aTbody = document.getElementById('admin-ticket-body');
@@ -1232,21 +1244,22 @@
         if(aTbody) aTbody.innerHTML = '';
         if(uTbody) uTbody.innerHTML = '';
 
-        const tickets = [...appData.tickets].reverse(); // Newest first
+        const tickets = [...appData.tickets].reverse(); 
         
         tickets.forEach(t => {
             const tr = document.createElement('tr');
             const statusBadge = t.status === 'Open' ? `<span class="badge badge-open">Open</span>` : `<span class="badge badge-resolved">Resolved</span>`;
             
-            const proofBtn = t.resolutionProof && t.resolutionProof.length > 5 
-                ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="openDocModal('${t.resolutionProof}', '')"><i class="fas fa-image"></i> Solved</button>` 
-                : `<span style="font-size:11px;color:#9ca3af">None</span>`;
-                
-            const issueProofBtn = t.issueProof && t.issueProof.length > 5
-                ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;margin-right:4px;" onclick="openDocModal('${t.issueProof}', '')"><i class="fas fa-camera"></i> Issue</button>` 
-                : '';
+            // Dynamic docs availability check
+            let hasDocs = (t.issueProof && t.issueProof.length > 5) || (t.resolutionProof && t.resolutionProof.length > 5) || (t.repairBill && t.repairBill.length > 5);
             
             if (currentUser.role === 'Admin' && aTbody) {
+                const adminDocsBtn = hasDocs 
+                    ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="viewTicketDocs('${t.id}')"><i class="fas fa-folder-open"></i> View Docs</button>`
+                    : `<span style="font-size:11px;color:#9ca3af">No Docs</span>`;
+                    
+                const costDisplay = t.repairCost ? `<div style="font-size:12px;color:var(--danger);font-weight:600;margin-top:4px;"><i class="fas fa-money-bill-wave"></i> Cost: $${t.repairCost}</div>` : '';
+
                 tr.innerHTML = `
                     <td style="font-weight:600;font-size:12px;">${t.id}</td>
                     <td style="font-size:12px;color:#6b7280">${t.date.split(' ')[0]}</td>
@@ -1255,18 +1268,24 @@
                     <td style="font-weight:500">${t.assetName}</td>
                     <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${t.issue}">
                         ${t.issue}
-                        ${issueProofBtn ? `<div style="margin-top:4px;">${issueProofBtn}</div>` : ''}
+                        ${costDisplay}
                     </td>
                     <td>${statusBadge}</td>
                     <td>
-                        ${t.status === 'Open' 
-                            ? `<button class="btn btn-success" style="padding:6px 10px;font-size:12px;" onclick="openResolveModal('${t.id}')"><i class="fas fa-check"></i> Resolve</button>` 
-                            : proofBtn}
+                        <div style="display:flex;gap:6px;">
+                            ${adminDocsBtn}
+                            ${t.status === 'Open' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:11px;" onclick="openResolveModal('${t.id}')"><i class="fas fa-check"></i> Resolve</button>` : ''}
+                        </div>
                     </td>
                 `;
                 aTbody.appendChild(tr);
             }
             if (uTbody && String(t.reportedBy).trim() === String(currentUser.userId).trim()) {
+                // Non-admin logic (Repair bill/cost stripped by backend)
+                const userDocsBtn = hasDocs 
+                    ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="viewTicketDocs('${t.id}')"><i class="fas fa-folder-open"></i> View Docs</button>`
+                    : `<span style="font-size:11px;color:#9ca3af">No Docs</span>`;
+
                 tr.innerHTML = `
                     <td style="font-weight:600;font-size:12px;">${t.id}</td>
                     <td style="font-size:12px;color:#6b7280">${t.date.split(' ')[0]}</td>
@@ -1274,12 +1293,7 @@
                     <td style="font-weight:500">${t.assetName}</td>
                     <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${t.issue}">${t.issue}</td>
                     <td>${statusBadge}</td>
-                    <td>
-                        <div style="display:flex; gap:4px;">
-                            ${issueProofBtn}
-                            ${proofBtn !== `<span style="font-size:11px;color:#9ca3af">None</span>` ? proofBtn : ''}
-                        </div>
-                    </td>
+                    <td>${userDocsBtn}</td>
                 `;
                 uTbody.appendChild(tr);
             }
@@ -1297,6 +1311,7 @@
                 <td>
                     <select class="input" style="padding:4px 8px;width:auto" onchange="updateUser('${u.userId}', 'role', this.value)" ${u.userId === currentUser.userId ? 'disabled' : ''}>
                         <option value="User" ${u.role==='User'?'selected':''}>User</option>
+                        <option value="Sub-Admin" ${u.role==='Sub-Admin'?'selected':''}>Sub-Admin</option>
                         <option value="Admin" ${u.role==='Admin'?'selected':''}>Admin</option>
                     </select>
                 </td>
@@ -1327,24 +1342,37 @@
         hideLoading();
     }
 
-    function openDocModal(photoUrl, billUrl) {
-        currentModalAssetUrls = { photo: photoUrl || '', bill: billUrl || '' };
-        document.getElementById('doc-modal').classList.add('show');
+    function openDocModal(docs) {
+        const header = document.getElementById('doc-tabs-header');
+        header.innerHTML = '';
+        currentModalAssetUrls = {};
         
-        const bPhoto = document.getElementById('btn-tab-photo');
-        const bBill = document.getElementById('btn-tab-bill');
+        let firstDoc = null;
+        docs.forEach((d, index) => {
+            if (d.url && d.url.length > 5 && !d.url.startsWith('ERROR')) {
+                if(!firstDoc) firstDoc = d;
+                currentModalAssetUrls[d.name] = d.url;
+                const btn = document.createElement('button');
+                btn.className = !firstDoc || firstDoc.name === d.name ? 'btn btn-primary' : 'btn btn-ghost';
+                btn.innerHTML = `<i class="${d.icon || 'fas fa-file'}"></i> <span style="white-space:nowrap">${d.name}</span>`;
+                btn.onclick = () => showIframe(d.name, header);
+                header.appendChild(btn);
+            }
+        });
         
-        bPhoto.style.display = photoUrl ? 'block' : 'none';
-        bBill.style.display = billUrl ? 'block' : 'none';
-        
-        if(photoUrl) showIframe('photo');
-        else if(billUrl) showIframe('bill');
+        if(firstDoc) {
+            document.getElementById('doc-iframe').src = firstDoc.url;
+            document.getElementById('doc-modal').classList.add('show');
+        } else {
+            showToast('No valid documents to display', 'error');
+        }
     }
 
-    function showIframe(type) {
-        document.getElementById('btn-tab-photo').className = type==='photo' ? 'btn btn-primary' : 'btn btn-ghost';
-        document.getElementById('btn-tab-bill').className = type==='bill' ? 'btn btn-primary' : 'btn btn-ghost';
-        document.getElementById('doc-iframe').src = currentModalAssetUrls[type];
+    function showIframe(name, header) {
+        Array.from(header.children).forEach(b => {
+            b.className = b.innerText.trim() === name.trim() ? 'btn btn-primary' : 'btn btn-ghost';
+        });
+        document.getElementById('doc-iframe').src = currentModalAssetUrls[name];
     }
 
     function closeModal(id) { 
@@ -1355,6 +1383,8 @@
     function openResolveModal(ticketId) {
         document.getElementById('resolve-ticket-id').value = ticketId;
         removeFile('proof');
+        removeFile('repairBill');
+        document.getElementById('resolve-cost').value = '';
         document.getElementById('resolve-modal').classList.add('show');
     }
 
@@ -1363,7 +1393,9 @@
         const payload = {
             action: 'resolveTicket',
             ticketId: document.getElementById('resolve-ticket-id').value,
-            proofData: filesData.proof
+            proofData: filesData.proof,
+            repairCost: document.getElementById('resolve-cost').value,
+            repairBillData: filesData.repairBill
         };
         try {
             const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -1379,7 +1411,6 @@
         const doc = new jsPDF('landscape');
         doc.setFontSize(18); doc.text(`Asset Report`, 14, 22);
         
-        // Added Status to columns
         const cols = ['Asset Name', 'Assigned To', 'Dept/Cabin', 'Warranty', 'Next Service', 'Providers', 'Status'];
         const rows = [];
         
