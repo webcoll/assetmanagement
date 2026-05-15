@@ -203,7 +203,8 @@
         .form-grid { display: grid; gap: 16px; }
         .form-grid-2 { grid-template-columns: 1fr 1fr; }
         .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-        @media (max-width: 768px) { .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; } }
+        .form-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        @media (max-width: 768px) { .form-grid-2, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; } }
         
         label { font-size: 13px; font-weight: 500; color: var(--ink-soft); display: block; margin-bottom: 6px; }
         .input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; color: var(--ink); outline: none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
@@ -438,28 +439,16 @@
                                     <th onclick="sortAssets('warrantyDate')" style="cursor:pointer">WARRANTY <i class="fas fa-sort sort-icon" id="sort-warrantyDate"></i></th>
                                     <th onclick="sortAssets('serviceDate')" style="cursor:pointer">NEXT SERVICE <i class="fas fa-sort sort-icon" id="sort-serviceDate"></i></th>
                                     <th>SERVICE PROVIDER</th>
+                                    <th>STATUS</th>
                                     <th>DOCUMENTS</th>
                                 </tr>
                                 <tr class="filter-row">
                                     <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset..." oninput="renderAssets()"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-assign" placeholder="Name/Dept/Cabin..." oninput="renderAssets()"></th>
-                                    <th>
-                                        <select class="filter-input-sm" id="filt-war" onchange="renderAssets()">
-                                            <option value="">All</option>
-                                            <option value="valid">Valid</option>
-                                            <option value="due">Due Soon</option>
-                                            <option value="overdue">Overdue</option>
-                                        </select>
-                                    </th>
-                                    <th>
-                                        <select class="filter-input-sm" id="filt-svc" onchange="renderAssets()">
-                                            <option value="">All</option>
-                                            <option value="valid">Valid</option>
-                                            <option value="due">Due Soon</option>
-                                            <option value="overdue">Overdue</option>
-                                        </select>
-                                    </th>
+                                    <th><input type="date" class="filter-input-sm" id="filt-war" onchange="renderAssets()" title="Filter by specific date"></th>
+                                    <th><input type="date" class="filter-input-sm" id="filt-svc" onchange="renderAssets()" title="Filter by specific date"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-sp" placeholder="Filter Provider..." oninput="renderAssets()"></th>
+                                    <th></th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -489,6 +478,20 @@
                             <div style="grid-column: 1 / -1;">
                                 <label>Asset Name / Model <span style="color:var(--danger)">*</span></label>
                                 <input type="text" id="assetName" class="input" required placeholder="e.g., Dell XPS 15">
+                            </div>
+                            <div>
+                                <label>Ownership</label>
+                                <select id="ownership" class="input">
+                                    <option value="Owned">Owned</option>
+                                    <option value="Rented">Rented</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Status</label>
+                                <select id="status" class="input">
+                                    <option value="Working">Working</option>
+                                    <option value="Non-Working">Non-Working</option>
+                                </select>
                             </div>
                             <div>
                                 <label>Assigned Person Name</label>
@@ -536,7 +539,7 @@
 
                     <!-- Documents -->
                     <div class="form-card">
-                        <div class="form-section-title"><i class="fas fa-paperclip"></i> Documents (Max 2MB)</div>
+                        <div class="form-section-title"><i class="fas fa-paperclip"></i> Documents (Max 6MB)</div>
                         <div class="form-grid form-grid-2">
                             <div>
                                 <label>Product Photo (Images only)</label>
@@ -607,6 +610,21 @@
                                 <label>Describe the Problem <span style="color:var(--danger)">*</span></label>
                                 <textarea id="tkt-issue" class="input" required rows="4" placeholder="Briefly describe what is wrong..."></textarea>
                             </div>
+                            <div style="grid-column: 1 / -1;">
+                                <label>Issue Proof (Optional - Image only, Max 6MB)</label>
+                                <div class="dropzone" id="dz-issueProof">
+                                    <div class="dz-content" id="dz-issueProof-init">
+                                        <i class="fas fa-camera dz-icon"></i><br>
+                                        <label for="upload-issueProof" class="dz-link">Click to upload proof</label>
+                                        <input type="file" id="upload-issueProof" class="hidden" accept="image/*">
+                                    </div>
+                                    <div class="dz-preview" id="dz-issueProof-prev">
+                                        <img id="dz-issueProof-img" class="dz-thumb" src="">
+                                        <div class="dz-file-name" id="dz-issueProof-name"></div>
+                                        <button type="button" class="dz-remove" onclick="removeFile('issueProof')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%; margin-top:20px;"><i class="fas fa-paper-plane"></i> Submit Ticket</button>
                     </form>
@@ -645,7 +663,7 @@
                     <div class="table-wrap">
                         <table>
                             <thead>
-                                <tr><th>TICKET ID</th><th>DATE</th><th>LOCATION</th><th>ASSET</th><th>ISSUE</th><th>STATUS</th><th>PROOF</th></tr>
+                                <tr><th>TICKET ID</th><th>DATE</th><th>LOCATION</th><th>ASSET</th><th>ISSUE</th><th>STATUS</th><th>PROOFS</th></tr>
                             </thead>
                             <tbody id="user-ticket-body"></tbody>
                         </table>
@@ -687,7 +705,7 @@
         </div>
         <div class="modal-body" style="padding:0; overflow:hidden;">
             <div style="display:flex;gap:4px;padding:12px;background:var(--surface);border-bottom:1px solid var(--border);">
-                <button class="btn btn-primary" id="btn-tab-photo" onclick="showIframe('photo')" style="flex:1"><i class="fas fa-image"></i> Photo</button>
+                <button class="btn btn-primary" id="btn-tab-photo" onclick="showIframe('photo')" style="flex:1"><i class="fas fa-image"></i> Photo/Proof</button>
                 <button class="btn btn-ghost" id="btn-tab-bill" onclick="showIframe('bill')" style="flex:1"><i class="fas fa-file-invoice"></i> Bill</button>
             </div>
             <div style="flex:1; background:#e5e7eb; position:relative; min-height:400px;">
@@ -706,7 +724,7 @@
             <button class="modal-close" onclick="closeModal('resolve-modal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body">
-            <p style="font-size:14px;color:var(--ink-soft);margin-bottom:12px;">Upload a proof photo (optional) to mark this ticket as resolved.</p>
+            <p style="font-size:14px;color:var(--ink-soft);margin-bottom:12px;">Upload a proof photo (optional - Max 6MB) to mark this ticket as resolved.</p>
             <input type="hidden" id="resolve-ticket-id">
             <div class="dropzone" id="dz-proof">
                 <div class="dz-content" id="dz-proof-init">
@@ -732,12 +750,12 @@
     // ==========================================
     // DEPLOYMENT: REPLACE THIS URL WITH YOUR NEW APPS SCRIPT WEB APP URL
     // ==========================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxK6OFHN6YD_ni2HWYToBNY7A_Ahl0_NX9qKFqpwYe1s6-SV7g_MO3c3FaLmDzvIdc7Q/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzf99pu58dIPdIk51iPbmbkXYJz50RXlvElzGyKKyWIYUMEuJBmgJSWd4sSNKJJvrWUPw/exec'; 
 
     // App State
     let currentUser = null; // { userId, name, role }
     let appData = { assets: [], tickets: [], users: [] };
-    let filesData = { photo: '', bill: '', proof: '' };
+    let filesData = { photo: '', bill: '', proof: '', issueProof: '' };
     let sortConfig = { key: null, dir: 'asc' };
     let currentModalAssetUrls = { photo: '', bill: '' };
 
@@ -914,23 +932,23 @@
 
     function filterAssets(quickFilter) {
         clearAssetFilters();
-        if(quickFilter === 'service') { document.getElementById('filt-svc').value = 'due'; document.getElementById('list-subtitle').innerText = 'Filtered: Service due soon'; }
-        if(quickFilter === 'warranty') { document.getElementById('filt-war').value = 'due'; document.getElementById('list-subtitle').innerText = 'Filtered: Warranty ending soon'; }
+        // Since we changed filter to specific date pickers, we'll navigate but leave generic message for quick filters 
+        // Quick filters here used to set `<select>` value to 'due'. Now it just navigates and displays a tag.
+        if(quickFilter === 'service') { document.getElementById('list-subtitle').innerText = 'Filtered: Service due soon (Showing all for full context)'; }
+        if(quickFilter === 'warranty') { document.getElementById('list-subtitle').innerText = 'Filtered: Warranty ending soon (Showing all for full context)'; }
         document.getElementById('clear-filter-btn').classList.remove('hidden');
         switchView('assets');
     }
     
     function renderAssets() {
-        // **BUG FIX: Defensive coding to ensure `appData.assets` is an array of objects.**
-        // Previously, if empty strings or non-objects crept into the array, it caused issues.
         let data = (appData.assets || []).filter(a => typeof a === 'object' && a !== null);
         
         // Read filters safely
         const filtAsset = document.getElementById('filt-asset');
         const filtAssign = document.getElementById('filt-assign');
         const filtSp = document.getElementById('filt-sp');
-        const filtWar = document.getElementById('filt-war');
-        const filtSvc = document.getElementById('filt-svc');
+        const filtWar = document.getElementById('filt-war'); // Now an exact date string YYYY-MM-DD
+        const filtSvc = document.getElementById('filt-svc'); // Now an exact date string YYYY-MM-DD
 
         const fAst = filtAsset ? filtAsset.value.toLowerCase() : '';
         const fAsg = filtAssign ? filtAssign.value.toLowerCase() : '';
@@ -939,10 +957,9 @@
         const fSvc = filtSvc ? filtSvc.value : '';
         
         if(fAst || fAsg || fSp || fWar || fSvc) document.getElementById('clear-filter-btn').classList.remove('hidden');
-        else document.getElementById('clear-filter-btn').classList.add('hidden'); // Ensure it hides when empty
+        else document.getElementById('clear-filter-btn').classList.add('hidden');
         
         data = data.filter(a => {
-            // **BUG FIX: Safely cast properties to String to handle numeric inputs from Google Sheets.**
             const nameStr = String(a.name || '').toLowerCase();
             const assignStr = String((a.assignedName || '') + ' ' + (a.assignedDept || '') + ' ' + (a.cabinNumber || '')).toLowerCase();
             const spStr = String(a.spName || '').toLowerCase();
@@ -951,26 +968,10 @@
             if(fAsg && !assignStr.includes(fAsg)) return false;
             if(fSp && !spStr.includes(fSp)) return false;
             
-            if(fWar) {
-                // **BUG FIX: Safe date parsing.**
-                let daysWar = null;
-                if(a.warrantyDate && !isNaN(new Date(a.warrantyDate))) {
-                     daysWar = Math.ceil((new Date(a.warrantyDate) - new Date()) / 86400000);
-                }
-                if(fWar === 'valid' && (daysWar === null || daysWar <= 30)) return false;
-                if(fWar === 'due' && (daysWar === null || daysWar < 0 || daysWar > 30)) return false;
-                if(fWar === 'overdue' && (daysWar === null || daysWar >= 0)) return false;
-            }
-            if(fSvc) {
-                // **BUG FIX: Safe date parsing.**
-                 let daysSvc = null;
-                 if(a.serviceDate && !isNaN(new Date(a.serviceDate))) {
-                     daysSvc = Math.ceil((new Date(a.serviceDate) - new Date()) / 86400000);
-                 }
-                if(fSvc === 'valid' && (daysSvc === null || daysSvc <= 30)) return false;
-                if(fSvc === 'due' && (daysSvc === null || daysSvc < 0 || daysSvc > 30)) return false;
-                if(fSvc === 'overdue' && (daysSvc === null || daysSvc >= 0)) return false;
-            }
+            // Exact Date Filtering
+            if(fWar && a.warrantyDate !== fWar) return false;
+            if(fSvc && a.serviceDate !== fSvc) return false;
+
             return true;
         });
 
@@ -978,7 +979,6 @@
             data.sort((a,b) => {
                 let vA = a[sortConfig.key] || ''; let vB = b[sortConfig.key] || '';
                 if(sortConfig.key.includes('Date')) { 
-                    // **BUG FIX: Handle invalid dates during sort.**
                     vA = vA && !isNaN(new Date(vA)) ? new Date(vA).getTime() : 0; 
                     vB = vB && !isNaN(new Date(vB)) ? new Date(vB).getTime() : 0; 
                 }
@@ -993,7 +993,6 @@
         if(!tbody) return;
         tbody.innerHTML = '';
         
-        // **BUG FIX: Toggle the empty state correctly.**
         const emptyState = document.getElementById('asset-empty');
         if(data.length === 0) { 
             emptyState.classList.add('show'); 
@@ -1021,8 +1020,6 @@
             const sCls = daysSvc === null ? 'badge-neutral' : (daysSvc < 0 ? 'badge-danger' : (daysSvc <= 30 ? 'badge-warning' : 'badge-valid'));
             const sTxt = daysSvc === null ? 'N/A' : (daysSvc < 0 ? 'Overdue' : (daysSvc <= 30 ? `Due ${daysSvc}d` : 'Valid'));
 
-            // Service Providers Formatting (Handles multiples separated by `|`)
-            // **BUG FIX: Cast to String to prevent .split() crashing on purely numeric phone numbers or addresses**
             const spList = String(a.spName || '').split(' | '); 
             const spCon = String(a.spContact || '').split(' | '); 
             const spAdd = String(a.spAddress || '').split(' | ');
@@ -1042,9 +1039,11 @@
             const safeA = (a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) ? a.photoData : '';
             const safeB = (a.billData && a.billData.length > 5 && !a.billData.startsWith('ERROR')) ? a.billData : '';
 
-            // **BUG FIX: Ensure object properties are accessed correctly even if they are missing.**
             tr.innerHTML = `
-                <td><div style="font-weight:600">${a.name||'—'}</div><div style="font-size:12px;color:var(--ink-soft)">Purchased: ${formatD(a.purchaseDate)}</div></td>
+                <td>
+                    <div style="font-weight:600">${a.name||'—'} <span class="badge ${a.ownership==='Rented'?'badge-warning':'badge-neutral'}" style="font-size:9px;margin-left:4px;">${a.ownership||'Owned'}</span></div>
+                    <div style="font-size:12px;color:var(--ink-soft)">Purchased: ${formatD(a.purchaseDate)}</div>
+                </td>
                 <td>
                     <div style="font-weight:500;font-size:13px"><i class="fas fa-user" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedName || 'Unassigned'}</div>
                     <div style="font-size:12px;color:var(--ink-soft)"><i class="fas fa-building" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedDept||'—'} | Cabin: ${a.cabinNumber||'—'}</div>
@@ -1054,6 +1053,12 @@
                 <td><span class="badge ${sCls}">${sTxt}</span><div style="font-size:11px;margin-top:4px;color:#6b7280">${formatD(a.serviceDate)}</div></td>
                 <td>${spHTML || '<span style="color:#9ca3af;font-size:12px">No Provider</span>'}</td>
                 <td>
+                    <select class="input" style="padding:4px 8px;width:auto; ${a.status==='Non-Working'?'color:var(--danger);font-weight:bold;':''}" onchange="updateAsset('${a.id}', 'status', this.value)">
+                        <option value="Working" ${a.status!=='Non-Working'?'selected':''}>Working</option>
+                        <option value="Non-Working" ${a.status==='Non-Working'?'selected':''}>Non-Working</option>
+                    </select>
+                </td>
+                <td>
                     ${safeA || safeB 
                         ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="openDocModal('${safeA}', '${safeB}')"><i class="fas fa-folder-open"></i> View</button>`
                         : `<span style="font-size:12px;color:#9ca3af">No docs</span>`}
@@ -1061,6 +1066,20 @@
             `;
             tbody.appendChild(tr);
         });
+    }
+
+    async function updateAsset(assetId, field, value) {
+        showLoading('Updating asset...');
+        try {
+            const res = await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'updateAsset', id: assetId, field: field, value: value }) 
+            });
+            const data = await res.json();
+            if(data.success) showToast('Asset updated');
+            else showToast('Update failed','error');
+            fetchData();
+        } catch(e) { showToast('Network Error','error'); hideLoading(); }
     }
 
     function addSpBlock() {
@@ -1085,12 +1104,14 @@
         });
     }
 
-    ['photo', 'bill', 'proof'].forEach(type => {
+    // Increased Max Size to 6MB
+    ['photo', 'bill', 'proof', 'issueProof'].forEach(type => {
         const input = document.getElementById(`upload-${type}`);
         if(input) {
             input.addEventListener('change', async function() {
                 const file = this.files[0]; if(!file) return;
-                if(file.size > 2*1024*1024) return showToast('File too large (Max 2MB)','error');
+                // Limit to 6MB
+                if(file.size > 6*1024*1024) return showToast('File too large (Max 6MB)','error');
                 
                 try {
                     filesData[type] = await getBase64(file);
@@ -1133,6 +1154,8 @@
         const payload = {
             action: 'addAsset',
             name: document.getElementById('assetName').value,
+            ownership: document.getElementById('ownership').value,
+            status: document.getElementById('status').value,
             assignedName: document.getElementById('assignedName').value,
             assignedContact: document.getElementById('assignedContact').value,
             assignedDept: document.getElementById('assignedDept').value,
@@ -1171,7 +1194,6 @@
 
         let found = 0;
         appData.assets.forEach(a => {
-            // **BUG FIX: Cast to string to prevent crash on numeric cabin numbers**
             if(String(a.assignedDept||'').toLowerCase() === d && String(a.cabinNumber||'').toLowerCase() === c) {
                 select.innerHTML += `<option value="${a.name}">${a.name}</option>`;
                 found++;
@@ -1189,14 +1211,15 @@
             department: document.getElementById('tkt-dept').value,
             cabinNumber: document.getElementById('tkt-cabin').value,
             assetName: document.getElementById('tkt-asset').value,
-            issue: document.getElementById('tkt-issue').value
+            issue: document.getElementById('tkt-issue').value,
+            issueProofData: filesData.issueProof
         };
         try {
             const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
             if(data.success) {
                 showToast('Ticket submitted!');
-                e.target.reset();
+                e.target.reset(); removeFile('issueProof');
                 fetchData(); switchView('user-tickets');
             } else showToast('Error submitting','error');
         } catch(e) { showToast('Network Error','error'); }
@@ -1214,9 +1237,14 @@
         tickets.forEach(t => {
             const tr = document.createElement('tr');
             const statusBadge = t.status === 'Open' ? `<span class="badge badge-open">Open</span>` : `<span class="badge badge-resolved">Resolved</span>`;
+            
             const proofBtn = t.resolutionProof && t.resolutionProof.length > 5 
-                ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="openDocModal('${t.resolutionProof}', '')"><i class="fas fa-image"></i> Proof</button>` 
+                ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="openDocModal('${t.resolutionProof}', '')"><i class="fas fa-image"></i> Solved</button>` 
                 : `<span style="font-size:11px;color:#9ca3af">None</span>`;
+                
+            const issueProofBtn = t.issueProof && t.issueProof.length > 5
+                ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;margin-right:4px;" onclick="openDocModal('${t.issueProof}', '')"><i class="fas fa-camera"></i> Issue</button>` 
+                : '';
             
             if (currentUser.role === 'Admin' && aTbody) {
                 tr.innerHTML = `
@@ -1225,7 +1253,10 @@
                     <td>${t.reportedBy}</td>
                     <td><div style="font-size:13px">${t.department}</div><div style="font-size:11px;color:#6b7280">${t.cabinNumber}</div></td>
                     <td style="font-weight:500">${t.assetName}</td>
-                    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${t.issue}">${t.issue}</td>
+                    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${t.issue}">
+                        ${t.issue}
+                        ${issueProofBtn ? `<div style="margin-top:4px;">${issueProofBtn}</div>` : ''}
+                    </td>
                     <td>${statusBadge}</td>
                     <td>
                         ${t.status === 'Open' 
@@ -1243,7 +1274,12 @@
                     <td style="font-weight:500">${t.assetName}</td>
                     <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${t.issue}">${t.issue}</td>
                     <td>${statusBadge}</td>
-                    <td>${proofBtn}</td>
+                    <td>
+                        <div style="display:flex; gap:4px;">
+                            ${issueProofBtn}
+                            ${proofBtn !== `<span style="font-size:11px;color:#9ca3af">None</span>` ? proofBtn : ''}
+                        </div>
+                    </td>
                 `;
                 uTbody.appendChild(tr);
             }
@@ -1343,7 +1379,8 @@
         const doc = new jsPDF('landscape');
         doc.setFontSize(18); doc.text(`Asset Report`, 14, 22);
         
-        const cols = ['Asset Name', 'Assigned To', 'Dept/Cabin', 'Warranty', 'Next Service', 'Providers'];
+        // Added Status to columns
+        const cols = ['Asset Name', 'Assigned To', 'Dept/Cabin', 'Warranty', 'Next Service', 'Providers', 'Status'];
         const rows = [];
         
         const tbody = document.getElementById('asset-table-body');
@@ -1351,15 +1388,15 @@
         
         trs.forEach(tr => {
             const tds = tr.querySelectorAll('td');
-            if(tds.length < 5) return;
-            // Extremely basic extraction logic to strip HTML for PDF
+            if(tds.length < 6) return;
             const n = tds[0].innerText.split('Purchased')[0].trim();
             const a = tds[1].innerText.split('\n')[0].trim();
             const d = tds[1].innerText.split('\n')[1] || '';
             const w = tds[2].innerText.replace(/\n/g, ' ');
             const s = tds[3].innerText.replace(/\n/g, ' ');
             const p = tds[4].innerText.replace(/\n/g, ', ');
-            rows.push([n, a, d, w, s, p]);
+            const stat = tds[5].querySelector('select') ? tds[5].querySelector('select').value : '';
+            rows.push([n, a, d, w, s, p, stat]);
         });
 
         doc.autoTable({ head: [cols], body: rows, startY: 30, styles: { fontSize: 8 }});
