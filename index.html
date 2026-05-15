@@ -1258,7 +1258,7 @@
                     ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="viewTicketDocs('${t.id}')"><i class="fas fa-folder-open"></i> View Docs</button>`
                     : `<span style="font-size:11px;color:#9ca3af">No Docs</span>`;
                     
-                const costDisplay = t.repairCost ? `<div style="font-size:12px;color:var(--danger);font-weight:600;margin-top:4px;"><i class="fas fa-money-bill-wave"></i> Cost: $${t.repairCost}</div>` : '';
+                const costDisplay = t.repairCost ? `<div style="font-size:12px;color:var(--danger);font-weight:600;margin-top:4px;"><i class="fas fa-money-bill-wave"></i> Cost: ₹${t.repairCost}</div>` : '';
 
                 tr.innerHTML = `
                     <td style="font-weight:600;font-size:12px;">${t.id}</td>
