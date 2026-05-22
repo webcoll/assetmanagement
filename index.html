@@ -414,7 +414,7 @@
                                     <th>ACTION</th>
                                 </tr>
                                 <tr class="filter-row">
-                                    <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset or SN..." oninput="renderAssets()"></th>
+                                    <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset or #..." oninput="renderAssets()"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-assign" placeholder="Name/Dept/Cabin..." oninput="renderAssets()"></th>
                                     <th><input type="date" class="filter-input-sm" id="filt-war" onchange="renderAssets()"></th>
                                     <th><input type="date" class="filter-input-sm" id="filt-svc" onchange="renderAssets()"></th>
@@ -487,19 +487,12 @@
                     <input type="hidden" id="editAssetId" value="">
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-desktop"></i> Asset Details</div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                            <div>
+
+                        <div class="form-grid form-grid-2">
+                            <div style="grid-column: 1 / -1;">
                                 <label>Asset Name / Model <span style="color:var(--danger)">*</span></label>
                                 <input type="text" id="assetName" class="input" required placeholder="e.g., Dell XPS 15">
                             </div>
-                            <div>
-                                <label>Serial Number</label>
-                                <input type="text" id="serialNumber" class="input" placeholder="e.g., SN-123456789">
-                            </div>
-                        </div>
-
-                        <div class="form-grid form-grid-2">
                             <div>
                                 <label>Ownership</label>
                                 <select id="ownership" class="input">
@@ -1134,8 +1127,8 @@
         
         data = data.filter(a => {
             const nameStr = String(a.name || '').toLowerCase();
-            const snStr = String(a.serialNumber || '').toLowerCase();
-            const comboAstStr = nameStr + " " + snStr;
+            const assetNum = appData.assets.findIndex(x => x.id === a.id) + 1;
+            const comboAstStr = nameStr + " #" + assetNum;
             const assignStr = String((a.assignedName || '') + ' ' + (a.assignedDept || '') + ' ' + (a.cabinNumber || '')).toLowerCase();
             const spStr = String(a.spName || '').toLowerCase();
 
@@ -1218,10 +1211,12 @@
                 ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" title="View Docs" onclick="viewAssetDocs('${a.id}')"><i class="fas fa-folder-open"></i></button>`
                 : `<span style="font-size:12px;color:#9ca3af;padding:6px 10px;">No docs</span>`;
 
+            const assetNum = appData.assets.findIndex(x => x.id === a.id) + 1;
+
             tr.innerHTML = `
                 <td>
                     <div style="font-weight:600">${a.name||'—'}</div>
-                    <div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">SN: <span style="font-family:monospace">${a.serialNumber||'—'}</span></div>
+                    <div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">Asset No: <span style="font-family:monospace;font-weight:600">#${assetNum}</span></div>
                     <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Purchased: ${formatD(a.purchaseDate)}</div>
                 </td>
                 <td>
@@ -1285,10 +1280,12 @@
                 ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="viewMyAssetPhoto('${a.id}')"><i class="fas fa-image"></i> View Photo</button>`
                 : `<span style="font-size:12px;color:#9ca3af">No Photo Available</span>`;
 
+            const assetNum = appData.assets.findIndex(x => x.id === a.id) + 1;
+
             tr.innerHTML = `
                 <td>
                     <div style="font-weight:600;font-size:15px;">${a.name||'—'}</div>
-                    <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">SN: <span style="font-family:monospace">${a.serialNumber||'—'}</span></div>
+                    <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Asset No: <span style="font-family:monospace;font-weight:600">#${assetNum}</span></div>
                 </td>
                 <td><span class="badge ${a.status==='Non-Working'?'badge-danger':'badge-valid'}" style="font-size:12px;padding:6px 10px;">${a.status || 'Working'}</span></td>
                 <td>${photoBtn}</td>
@@ -1338,7 +1335,6 @@
         document.getElementById('form-submit-btn').innerHTML = '<i class="fas fa-sync"></i> Update Asset';
 
         document.getElementById('assetName').value = a.name || '';
-        document.getElementById('serialNumber').value = a.serialNumber || '';
         document.getElementById('ownership').value = a.ownership || 'Own';
         document.getElementById('status').value = a.status || 'Working';
         document.getElementById('assignedName').value = a.assignedName || '';
@@ -1480,7 +1476,6 @@
             action: isEditing ? 'editAsset' : 'addAsset',
             id: editId,
             name: document.getElementById('assetName').value,
-            serialNumber: document.getElementById('serialNumber').value, // NEW SN FIELD
             ownership: document.getElementById('ownership').value,
             status: document.getElementById('status').value,
             assignedName: finalAssignedName,
