@@ -56,6 +56,11 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #loader-text { font-size: 14px; font-weight: 500; color: var(--ink-soft); }
 
+        #progress-wrap { width: 220px; text-align: center; margin-top: 12px; transition: opacity 0.3s; }
+        .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-text { font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-top: 8px; font-family: 'Roboto', sans-serif; }
+
         .auth-view { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100; background: var(--ink); overflow: hidden; }
         .auth-bg { position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(220,38,38,0.15), transparent 50%), var(--ink); }
         .auth-card { position: relative; z-index: 2; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px); border-radius: 20px; padding: 40px; width: 100%; max-width: 400px; margin: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-out both; }
@@ -138,11 +143,6 @@
         .btn-success:hover { background: #047857; box-shadow: 0 4px 10px rgba(5,150,105,0.3); transform: translateY(-1px); }
         .btn-ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--border); }
         .btn-ghost:hover { background: var(--surface-2); color: var(--ink); border-color: #d1d5db; }
-
-        #progress-wrap { width: 220px; text-align: center; margin-top: 12px; transition: opacity 0.3s; }
-        .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .progress-text { font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-top: 8px; font-family: 'Roboto', sans-serif; }
 
         .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); animation: fadeIn 0.5s ease; }
         .table-wrap { overflow-x: auto; }
@@ -313,7 +313,7 @@
                 <div class="nav-section-label">Management</div>
                 <button onclick="switchView('dashboard')" data-view="dashboard" class="nav-btn active"><i class="fas fa-chart-pie"></i> Dashboard</button>
                 <button onclick="switchView('assets')" data-view="assets" class="nav-btn"><i class="fas fa-list-ul"></i> All Assets</button>
-                <button onclick="switchView('add-asset')" data-view="add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
+                <button onclick="openAddAssetForm()" data-view="add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
                 <div class="nav-section-label">Redressal</div>
                 <button onclick="switchView('admin-tickets')" data-view="admin-tickets" class="nav-btn"><i class="fas fa-ticket-alt"></i> All Tickets</button>
                 <div class="nav-section-label">System</div>
@@ -323,7 +323,7 @@
             <!-- Sub-Admin Additions -->
             <div class="sub-admin-only">
                 <div class="nav-section-label">Management</div>
-                <button onclick="switchView('add-asset')" data-view="add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
+                <button onclick="openAddAssetForm()" data-view="add-asset" class="nav-btn"><i class="fas fa-plus"></i> Add Asset</button>
             </div>
 
             <!-- User & Sub-Admin Only Links -->
@@ -395,7 +395,7 @@
                     <div><h2 class="page-title">Asset Directory</h2><p class="page-sub" id="list-subtitle">Showing all active assets</p></div>
                     <div style="display:flex;gap:10px;">
                         <button id="clear-filter-btn" onclick="clearAssetFilters()" class="btn btn-ghost hidden"><i class="fas fa-times"></i> Clear Filter</button>
-                        <button onclick="switchView('add-asset')" class="btn btn-primary"><i class="fas fa-plus"></i> Add Asset</button>
+                        <button onclick="openAddAssetForm()" class="btn btn-primary"><i class="fas fa-plus"></i> Add Asset</button>
                         <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i></button>
                     </div>
                 </div>
@@ -411,10 +411,10 @@
                                     <th>SERVICE PROVIDER</th>
                                     <th>STATUS</th>
                                     <th>OWNERSHIP</th>
-                                    <th>DOCUMENTS</th>
+                                    <th>ACTION</th>
                                 </tr>
                                 <tr class="filter-row">
-                                    <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset..." oninput="renderAssets()"></th>
+                                    <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset or SN..." oninput="renderAssets()"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-assign" placeholder="Name/Dept/Cabin..." oninput="renderAssets()"></th>
                                     <th><input type="date" class="filter-input-sm" id="filt-war" onchange="renderAssets()"></th>
                                     <th><input type="date" class="filter-input-sm" id="filt-svc" onchange="renderAssets()"></th>
@@ -474,20 +474,32 @@
                 </div>
             </div>
 
-            <!-- Add Asset (Admin & Sub-Admin) -->
+            <!-- Add / Edit Asset (Admin & Sub-Admin) -->
             <div id="view-add-asset" class="view-layer">
                 <div class="page-header">
-                    <div><h2 class="page-title">Register Asset</h2><p class="page-sub">Track new equipment and its assignments</p></div>
+                    <div>
+                        <h2 class="page-title" id="form-page-title">Register Asset</h2>
+                        <p class="page-sub" id="form-page-sub">Track new equipment and its assignments</p>
+                    </div>
                     <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i> Refresh</button>
                 </div>
                 <form id="add-asset-form">
+                    <input type="hidden" id="editAssetId" value="">
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-desktop"></i> Asset Details</div>
-                        <div class="form-grid form-grid-2">
-                            <div style="grid-column: 1 / -1;">
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
                                 <label>Asset Name / Model <span style="color:var(--danger)">*</span></label>
                                 <input type="text" id="assetName" class="input" required placeholder="e.g., Dell XPS 15">
                             </div>
+                            <div>
+                                <label>Serial Number</label>
+                                <input type="text" id="serialNumber" class="input" placeholder="e.g., SN-123456789">
+                            </div>
+                        </div>
+
+                        <div class="form-grid form-grid-2">
                             <div>
                                 <label>Ownership</label>
                                 <select id="ownership" class="input">
@@ -534,13 +546,7 @@
                     <div class="form-card">
                         <div class="form-section-title"><i class="fas fa-headset"></i> Service Providers</div>
                         <div id="sp-container">
-                            <div class="sp-block">
-                                <div class="form-grid form-grid-2">
-                                    <div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="ABC Electronics"></div>
-                                    <div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="1800-123-456"></div>
-                                    <div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="123 Tech Lane, City"></div>
-                                </div>
-                            </div>
+                            <!-- JS Will auto fill this block -->
                         </div>
                         <button type="button" class="add-sp-btn" onclick="addSpBlock()"><i class="fas fa-plus"></i> Add Another Provider</button>
                     </div>
@@ -583,7 +589,7 @@
                     </div>
                     <div style="display:flex;gap:12px;justify-content:flex-end;">
                         <button type="button" class="btn btn-ghost" onclick="switchView(currentUser.role === 'Admin' ? 'assets' : 'my-assets')">Cancel</button>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Asset</button>
+                        <button type="submit" class="btn btn-primary" id="form-submit-btn"><i class="fas fa-save"></i> Save Asset</button>
                     </div>
                 </form>
             </div>
@@ -702,7 +708,7 @@
             <div id="doc-tabs-header" style="display:flex;gap:4px;padding:12px;background:var(--surface);border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0;">
                 <!-- Dynamic Buttons generated here -->
             </div>
-            <!-- FIXED: Dynamic container for both Image and PDF iframe -->
+            <!-- Dynamic container for both Image and PDF iframe -->
             <div style="flex:1; background:#e5e7eb; position:relative; min-height:400px; display:flex; align-items:center; justify-content:center; overflow:auto;">
                 <img id="doc-img" style="max-width:100%; max-height:100%; display:none; object-fit:contain;" src="">
                 <iframe id="doc-iframe" style="width:100%;height:100%;border:0;position:absolute;inset:0; display:none; transition: opacity 0.3s ease;"></iframe>
@@ -789,7 +795,7 @@
     // ==========================================
     // DEPLOYMENT: REPLACE THIS URL WITH YOUR NEW APPS SCRIPT WEB APP URL
     // ==========================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2bOWTESDeQbXO5tn_964LwBn_b58A1arZHmbAe3bXM-iNeEWlp2lC-aVzpUgQEalk-Q/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4TDMh1zaqwxJCrewqfcJSU4orAwR7mvMWXe1kvMpUSAG4wUPfHEX2wOAsWqWy7TqMYQ/exec'; 
 
     let currentUser = null; 
     let appData = { assets: [], tickets: [], users: [] };
@@ -855,6 +861,7 @@
         l.style.opacity = '0';
         setTimeout(() => l.classList.add('hidden'), 300);
     }
+
     function showToast(msg, type = 'success') {
         const t = document.createElement('div');
         t.className = `toast ${type}`;
@@ -912,7 +919,6 @@
         document.getElementById('auth-view').classList.remove('hidden');
     }
 
-    /* STREAMING_CHUNK: Adding dedicated initialize phase to load data *before* showing app UI */
     async function initializeAppData() {
         try {
             const res = await fetch(`${SCRIPT_URL}?action=getAppData&role=${currentUser.role}&userId=${encodeURIComponent(currentUser.userId)}&userName=${encodeURIComponent(currentUser.name)}`);
@@ -971,11 +977,11 @@
         if(isAdmin) {
             mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
                                   <button class="mobile-nav-btn" onclick="switchView('assets')"><i class="fas fa-list-ul"></i> All Assets</button>
-                                  <button class="mobile-nav-btn" onclick="switchView('add-asset')"><i class="fas fa-plus"></i> Add Asset</button>
+                                  <button class="mobile-nav-btn" onclick="openAddAssetForm()"><i class="fas fa-plus"></i> Add Asset</button>
                                   <button class="mobile-nav-btn" onclick="switchView('admin-tickets')"><i class="fas fa-ticket-alt"></i> All Tickets</button>
                                   <button class="mobile-nav-btn" onclick="switchView('admin-users')"><i class="fas fa-users"></i> Users</button>`;
         } else if (isSubAdmin) {
-            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="switchView('add-asset')"><i class="fas fa-plus"></i> Add Asset</button>
+            mobMenu.innerHTML += `<button class="mobile-nav-btn" onclick="openAddAssetForm()"><i class="fas fa-plus"></i> Add Asset</button>
                                   <button class="mobile-nav-btn" onclick="switchView('my-assets')"><i class="fas fa-laptop"></i> My Assets</button>
                                   <button class="mobile-nav-btn" onclick="switchView('report-issue')"><i class="fas fa-triangle-exclamation"></i> Report Issue</button>
                                   <button class="mobile-nav-btn" onclick="switchView('user-tickets')"><i class="fas fa-list-check"></i> My Tickets</button>`;
@@ -1109,7 +1115,6 @@
         switchView('assets');
     }
 
-    // Explicit Render logic for Admin Assets table
     function renderAssets() {
         let data = (appData.assets || []).filter(a => typeof a === 'object' && a !== null);
         
@@ -1121,7 +1126,6 @@
         const fStatus = document.getElementById('filt-status') ? document.getElementById('filt-status').value : '';
         const fOwnership = document.getElementById('filt-ownership') ? document.getElementById('filt-ownership').value : '';
         
-        // FIXED: Now we also check if a currentQuickFilter is active to show the clear button
         if(fAst || fAsg || fSp || fWar || fSvc || fStatus || fOwnership || currentQuickFilter) {
             document.getElementById('clear-filter-btn').classList.remove('hidden');
         } else {
@@ -1130,10 +1134,12 @@
         
         data = data.filter(a => {
             const nameStr = String(a.name || '').toLowerCase();
+            const snStr = String(a.serialNumber || '').toLowerCase();
+            const comboAstStr = nameStr + " " + snStr;
             const assignStr = String((a.assignedName || '') + ' ' + (a.assignedDept || '') + ' ' + (a.cabinNumber || '')).toLowerCase();
             const spStr = String(a.spName || '').toLowerCase();
 
-            if(fAst && !nameStr.includes(fAst)) return false;
+            if(fAst && !comboAstStr.includes(fAst)) return false;
             if(fAsg && !assignStr.includes(fAsg)) return false;
             if(fSp && !spStr.includes(fSp)) return false;
             if(fWar && a.warrantyDate !== fWar) return false;
@@ -1209,13 +1215,14 @@
             const safeA = (a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) ? a.photoData : '';
             const safeB = (a.billData && a.billData.length > 5 && !a.billData.startsWith('ERROR')) ? a.billData : '';
             const docBtn = safeA || safeB 
-                ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="viewAssetDocs('${a.id}')"><i class="fas fa-folder-open"></i> View</button>`
-                : `<span style="font-size:12px;color:#9ca3af">No docs</span>`;
+                ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" title="View Docs" onclick="viewAssetDocs('${a.id}')"><i class="fas fa-folder-open"></i></button>`
+                : `<span style="font-size:12px;color:#9ca3af;padding:6px 10px;">No docs</span>`;
 
             tr.innerHTML = `
                 <td>
                     <div style="font-weight:600">${a.name||'—'}</div>
-                    <div style="font-size:12px;color:var(--ink-soft)">Purchased: ${formatD(a.purchaseDate)}</div>
+                    <div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">SN: <span style="font-family:monospace">${a.serialNumber||'—'}</span></div>
+                    <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Purchased: ${formatD(a.purchaseDate)}</div>
                 </td>
                 <td>
                     <div style="font-weight:500;font-size:13px"><i class="fas fa-user" style="color:#9ca3af;font-size:10px;margin-right:4px"></i>${a.assignedName || 'Unassigned'}</div>
@@ -1237,7 +1244,12 @@
                         <option value="Rented" ${a.ownership==='Rented'?'selected':''}>Rented</option>
                     </select>
                 </td>
-                <td>${docBtn}</td>
+                <td>
+                    <div style="display:flex;gap:4px;">
+                        ${docBtn}
+                        <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" title="Edit Asset" onclick="loadEditForm('${a.id}')"><i class="fas fa-edit"></i></button>
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -1269,7 +1281,6 @@
             const tr = document.createElement('tr');
             const safeA = (a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) ? a.photoData : '';
             
-            // FIXED: Passing the ID instead of the massive Base64 string to avoid HTML parsing errors
             const photoBtn = safeA 
                 ? `<button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="viewMyAssetPhoto('${a.id}')"><i class="fas fa-image"></i> View Photo</button>`
                 : `<span style="font-size:12px;color:#9ca3af">No Photo Available</span>`;
@@ -1277,6 +1288,7 @@
             tr.innerHTML = `
                 <td>
                     <div style="font-weight:600;font-size:15px;">${a.name||'—'}</div>
+                    <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">SN: <span style="font-family:monospace">${a.serialNumber||'—'}</span></div>
                 </td>
                 <td><span class="badge ${a.status==='Non-Working'?'badge-danger':'badge-valid'}" style="font-size:12px;padding:6px 10px;">${a.status || 'Working'}</span></td>
                 <td>${photoBtn}</td>
@@ -1296,16 +1308,108 @@
         } catch(e) { showToast('Network Error','error'); hideLoading(); }
     }
 
-    function addSpBlock() {
+    function openAddAssetForm() {
+        document.getElementById('add-asset-form').reset();
+        document.getElementById('editAssetId').value = '';
+        document.getElementById('form-page-title').innerText = 'Register Asset';
+        document.getElementById('form-page-sub').innerText = 'Track new equipment and its assignments';
+        document.getElementById('form-submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Asset';
+        
+        document.getElementById('sp-container').innerHTML = `
+            <div class="sp-block">
+                <div class="form-grid form-grid-2">
+                    <div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="ABC Electronics"></div>
+                    <div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="1800-123-456"></div>
+                    <div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="123 Tech Lane, City"></div>
+                </div>
+            </div>`;
+        
+        removeFile('photo'); removeFile('bill');
+        switchView('add-asset');
+    }
+
+    function loadEditForm(assetId) {
+        const a = appData.assets.find(x => String(x.id) === String(assetId));
+        if(!a) return showToast('Asset not found', 'error');
+
+        document.getElementById('editAssetId').value = a.id;
+        document.getElementById('form-page-title').innerText = 'Edit Asset';
+        document.getElementById('form-page-sub').innerText = `Editing: ${a.name}`;
+        document.getElementById('form-submit-btn').innerHTML = '<i class="fas fa-sync"></i> Update Asset';
+
+        document.getElementById('assetName').value = a.name || '';
+        document.getElementById('serialNumber').value = a.serialNumber || '';
+        document.getElementById('ownership').value = a.ownership || 'Own';
+        document.getElementById('status').value = a.status || 'Working';
+        document.getElementById('assignedName').value = a.assignedName || '';
+        document.getElementById('assignedContact').value = a.assignedContact || '';
+        document.getElementById('assignedDept').value = a.assignedDept || '';
+        document.getElementById('cabinNumber').value = a.cabinNumber || '';
+        
+        // Format dates correctly for input[type="date"]
+        const formatForInput = d => {
+            if(!d) return '';
+            const dt = new Date(d);
+            return isNaN(dt) ? '' : dt.toISOString().split('T')[0];
+        };
+        document.getElementById('purchaseDate').value = formatForInput(a.purchaseDate);
+        document.getElementById('warrantyDate').value = formatForInput(a.warrantyDate);
+        document.getElementById('serviceDate').value = formatForInput(a.serviceDate);
+
+        // Reconstruct Service Provider blocks
+        const spContainer = document.getElementById('sp-container');
+        spContainer.innerHTML = '';
+        const spNames = String(a.spName || '').split(' | ');
+        const spContacts = String(a.spContact || '').split(' | ');
+        const spAddresses = String(a.spAddress || '').split(' | ');
+        
+        if (spNames.length === 0 || (spNames.length === 1 && !spNames[0])) {
+            addSpBlock();
+        } else {
+            for(let i=0; i<spNames.length; i++) {
+                if(!spNames[i] && !spContacts[i] && !spAddresses[i]) continue;
+                addSpBlock(spNames[i], spContacts[i], spAddresses[i]);
+            }
+        }
+
+        // Preview Existing Files
+        if(a.photoData && a.photoData.length > 5 && !a.photoData.startsWith('ERROR')) {
+            filesData.photo = a.photoData;
+            document.getElementById('dz-photo-init').style.display = 'none';
+            document.getElementById('dz-photo-prev').classList.add('show');
+            document.getElementById('dz-photo-img').src = a.photoData;
+            document.getElementById('dz-photo-img').style.display = 'block';
+            document.getElementById('dz-photo-name').innerText = 'Existing Photo';
+        } else { removeFile('photo'); }
+
+        if(a.billData && a.billData.length > 5 && !a.billData.startsWith('ERROR')) {
+            filesData.bill = a.billData;
+            document.getElementById('dz-bill-init').style.display = 'none';
+            document.getElementById('dz-bill-prev').classList.add('show');
+            if(a.billData.startsWith('data:image/')) {
+                document.getElementById('dz-bill-img').src = a.billData;
+                document.getElementById('dz-bill-img').style.display = 'block';
+                document.getElementById('dz-bill-icon').style.display = 'none';
+            } else {
+                document.getElementById('dz-bill-img').style.display = 'none';
+                document.getElementById('dz-bill-icon').style.display = 'flex';
+            }
+            document.getElementById('dz-bill-name').innerText = 'Existing Bill';
+        } else { removeFile('bill'); }
+
+        switchView('add-asset');
+    }
+
+    function addSpBlock(name='', contact='', address='') {
         const container = document.getElementById('sp-container');
         const block = document.createElement('div');
         block.className = 'sp-block';
         block.style.animation = 'fadeIn 0.3s ease';
         block.innerHTML = `<button type="button" class="remove-sp-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
                            <div class="form-grid form-grid-2">
-                               <div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="Name"></div>
-                               <div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="Phone"></div>
-                               <div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="Address"></div>
+                               <div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="Provider" value="${name}"></div>
+                               <div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="Phone" value="${contact}"></div>
+                               <div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="Address" value="${address}"></div>
                            </div>`;
         container.appendChild(block);
     }
@@ -1351,7 +1455,7 @@
     }
 
     document.getElementById('add-asset-form').addEventListener('submit', async (e) => {
-        e.preventDefault(); showLoading('Saving Asset...');
+        e.preventDefault(); 
         
         let finalAssignedName = document.getElementById('assignedName').value.trim();
         if (finalAssignedName && appData.users.length > 0) {
@@ -1368,9 +1472,15 @@
             if(n||c||a) { names.push(n); contacts.push(c); addresses.push(a); }
         });
 
+        const editId = document.getElementById('editAssetId').value;
+        const isEditing = !!editId;
+        showLoading(isEditing ? 'Updating Asset...' : 'Saving Asset...');
+
         const payload = {
-            action: 'addAsset',
+            action: isEditing ? 'editAsset' : 'addAsset',
+            id: editId,
             name: document.getElementById('assetName').value,
+            serialNumber: document.getElementById('serialNumber').value, // NEW SN FIELD
             ownership: document.getElementById('ownership').value,
             status: document.getElementById('status').value,
             assignedName: finalAssignedName,
@@ -1391,10 +1501,10 @@
             const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
             if(data.success) {
-                showToast('Asset saved successfully!');
-                e.target.reset(); removeFile('photo'); removeFile('bill');
-                document.getElementById('sp-container').innerHTML = `<div class="sp-block"><div class="form-grid form-grid-2"><div><label>Provider Name</label><input type="text" class="input sp-name" placeholder="ABC Electronics"></div><div><label>Contact Number</label><input type="text" class="input sp-contact" placeholder="1800-123-456"></div><div style="grid-column: 1 / -1;"><label>Address</label><input type="text" class="input sp-address" placeholder="123 Tech Lane, City"></div></div></div>`;
-                fetchData(); switchView(currentUser.role === 'Admin' ? 'assets' : 'my-assets');
+                showToast(isEditing ? 'Asset updated successfully!' : 'Asset saved successfully!');
+                openAddAssetForm(); // resets UI
+                fetchData(); 
+                switchView(currentUser.role === 'Admin' ? 'assets' : 'my-assets');
             } else showToast('Error saving asset','error');
         } catch(e) { showToast('Network Error','error'); }
         hideLoading();
@@ -1438,7 +1548,6 @@
         hideLoading();
     });
 
-    // FIXED: Helper function to retrieve the photo safely based on asset ID
     function viewMyAssetPhoto(id) {
         const a = appData.assets.find(x => String(x.id) === String(id));
         if(a && a.photoData) {
@@ -1643,18 +1752,14 @@
         const iframe = document.getElementById('doc-iframe');
         const img = document.getElementById('doc-img');
         
-        // FIXED: Check MIME type. Iframes fail with Base64 images often. Use IMG tag for images.
         if (url.startsWith('data:image/')) {
             iframe.style.display = 'none';
-            iframe.src = ''; // Clear iframe memory
-            
+            iframe.src = ''; 
             img.src = url;
             img.style.display = 'block';
         } else {
-            // Assume it is a PDF or generic file format that can use iframe
             img.style.display = 'none';
             img.src = '';
-            
             iframe.style.display = 'block';
             iframe.style.opacity = 1;
             iframe.src = url;
