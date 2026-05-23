@@ -214,7 +214,7 @@
         .modal-title { font-size: 18px; font-weight: 700; color: var(--ink); }
         .modal-close { width: 32px; height: 32px; border-radius: 8px; background: var(--surface); border: none; color: var(--ink-soft); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .modal-close:hover { background: var(--danger-soft); color: var(--danger); transform: rotate(90deg); }
-        .modal-body { flex: 1; padding: 24px; overflow-y: auto; background: var(--surface); display: flex; flex-direction: column; gap: 16px; }
+        .modal-body { flex: 1; padding: 24px; overflow:y: auto; background: var(--surface); display: flex; flex-direction: column; gap: 16px; }
         
         .empty-state { padding: 48px 24px; text-align: center; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease; }
         .empty-state.show { display: flex; }
@@ -393,7 +393,8 @@
             <div id="view-assets" class="view-layer">
                 <div class="page-header">
                     <div><h2 class="page-title">Asset Directory</h2><p class="page-sub" id="list-subtitle">Showing all active assets</p></div>
-                    <div style="display:flex;gap:10px;">
+                    <div style="display:flex;gap:10px; align-items:center;">
+                        <span id="asset-count-badge" style="font-size:14px; font-weight:600; color:var(--ink-soft); margin-right: 8px;">Count: 0</span>
                         <button id="clear-filter-btn" onclick="clearAssetFilters()" class="btn btn-ghost hidden"><i class="fas fa-times"></i> Clear Filter</button>
                         <button onclick="openAddAssetForm()" class="btn btn-primary"><i class="fas fa-plus"></i> Add Asset</button>
                         <button class="btn btn-ghost" onclick="fetchData()"><i class="fas fa-rotate"></i></button>
@@ -404,6 +405,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th onclick="sortAssets('AssetID', 'assets')" style="cursor:pointer">ASSET ID <i class="fas fa-sort sort-icon" id="sort-assets-AssetID"></i></th>
                                     <th onclick="sortAssets('name', 'assets')" style="cursor:pointer">ASSET <i class="fas fa-sort sort-icon" id="sort-assets-name"></i></th>
                                     <th onclick="sortAssets('assignedName', 'assets')" style="cursor:pointer">ASSIGNMENT <i class="fas fa-sort sort-icon" id="sort-assets-assignedName"></i></th>
                                     <th onclick="sortAssets('warrantyDate', 'assets')" style="cursor:pointer">WARRANTY <i class="fas fa-sort sort-icon" id="sort-assets-warrantyDate"></i></th>
@@ -414,7 +416,8 @@
                                     <th>ACTION</th>
                                 </tr>
                                 <tr class="filter-row">
-                                    <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset or #..." oninput="renderAssets()"></th>
+                                    <th><input type="text" class="filter-input-sm" id="filt-asset-id" placeholder="Filter ID..." oninput="renderAssets()"></th>
+                                    <th><input type="text" class="filter-input-sm" id="filt-asset" placeholder="Filter Asset or SN..." oninput="renderAssets()"></th>
                                     <th><input type="text" class="filter-input-sm" id="filt-assign" placeholder="Name/Dept/Cabin..." oninput="renderAssets()"></th>
                                     <th><input type="date" class="filter-input-sm" id="filt-war" onchange="renderAssets()"></th>
                                     <th><input type="date" class="filter-input-sm" id="filt-svc" onchange="renderAssets()"></th>
@@ -489,7 +492,11 @@
                         <div class="form-section-title"><i class="fas fa-desktop"></i> Asset Details</div>
 
                         <div class="form-grid form-grid-2">
-                            <div style="grid-column: 1 / -1;">
+                            <div>
+                                <label>Asset ID / Tag <span style="color:var(--danger)">*</span></label>
+                                <input type="text" id="customAssetId" class="input" required placeholder="e.g., AST-001">
+                            </div>
+                            <div>
                                 <label>Asset Name / Model <span style="color:var(--danger)">*</span></label>
                                 <input type="text" id="assetName" class="input" required placeholder="e.g., Dell XPS 15">
                             </div>
@@ -1086,6 +1093,7 @@
 
     function clearAssetFilters() {
         currentQuickFilter = null;
+        document.getElementById('filt-asset-id').value = '';
         document.getElementById('filt-asset').value = '';
         document.getElementById('filt-assign').value = '';
         document.getElementById('filt-war').value = '';
@@ -1111,6 +1119,7 @@
     function renderAssets() {
         let data = (appData.assets || []).filter(a => typeof a === 'object' && a !== null);
         
+        const fId = document.getElementById('filt-asset-id') ? document.getElementById('filt-asset-id').value.toLowerCase() : '';
         const fAst = document.getElementById('filt-asset') ? document.getElementById('filt-asset').value.toLowerCase() : '';
         const fAsg = document.getElementById('filt-assign') ? document.getElementById('filt-assign').value.toLowerCase() : '';
         const fSp  = document.getElementById('filt-sp') ? document.getElementById('filt-sp').value.toLowerCase() : '';
@@ -1119,19 +1128,21 @@
         const fStatus = document.getElementById('filt-status') ? document.getElementById('filt-status').value : '';
         const fOwnership = document.getElementById('filt-ownership') ? document.getElementById('filt-ownership').value : '';
         
-        if(fAst || fAsg || fSp || fWar || fSvc || fStatus || fOwnership || currentQuickFilter) {
+        if(fId || fAst || fAsg || fSp || fWar || fSvc || fStatus || fOwnership || currentQuickFilter) {
             document.getElementById('clear-filter-btn').classList.remove('hidden');
         } else {
             document.getElementById('clear-filter-btn').classList.add('hidden');
         }
         
         data = data.filter(a => {
+            const idStr = String(a.AssetID || a.id || '').toLowerCase();
             const nameStr = String(a.name || '').toLowerCase();
             const assetNum = appData.assets.findIndex(x => x.id === a.id) + 1;
             const comboAstStr = nameStr + " #" + assetNum;
             const assignStr = String((a.assignedName || '') + ' ' + (a.assignedDept || '') + ' ' + (a.cabinNumber || '')).toLowerCase();
             const spStr = String(a.spName || '').toLowerCase();
 
+            if(fId && !idStr.includes(fId)) return false;
             if(fAst && !comboAstStr.includes(fAst)) return false;
             if(fAsg && !assignStr.includes(fAsg)) return false;
             if(fSp && !spStr.includes(fSp)) return false;
@@ -1169,6 +1180,10 @@
                 return 0;
             });
         }
+
+        // Update the count display after filtering
+        const countBadge = document.getElementById('asset-count-badge');
+        if (countBadge) countBadge.innerText = 'Count: ' + data.length;
 
         const tbody = document.getElementById('asset-table-body'); if(!tbody) return;
         tbody.innerHTML = '';
@@ -1215,8 +1230,11 @@
 
             tr.innerHTML = `
                 <td>
+                    <div style="font-family:monospace;font-size:13px;font-weight:600;color:var(--ink);">${a.AssetID || a.id}</div>
+                </td>
+                <td>
                     <div style="font-weight:600">${a.name||'—'}</div>
-                    <div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">Asset No: <span style="font-family:monospace;font-weight:600">#${assetNum}</span></div>
+                    <div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">Serial Number: <span style="font-family:monospace;font-weight:600">#${assetNum}</span></div>
                     <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Purchased: ${formatD(a.purchaseDate)}</div>
                 </td>
                 <td>
@@ -1285,7 +1303,7 @@
             tr.innerHTML = `
                 <td>
                     <div style="font-weight:600;font-size:15px;">${a.name||'—'}</div>
-                    <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Asset No: <span style="font-family:monospace;font-weight:600">#${assetNum}</span></div>
+                    <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Asset ID: <span style="font-family:monospace;font-weight:600">${a.AssetID || a.id}</span></div>
                 </td>
                 <td><span class="badge ${a.status==='Non-Working'?'badge-danger':'badge-valid'}" style="font-size:12px;padding:6px 10px;">${a.status || 'Working'}</span></td>
                 <td>${photoBtn}</td>
@@ -1334,6 +1352,7 @@
         document.getElementById('form-page-sub').innerText = `Editing: ${a.name}`;
         document.getElementById('form-submit-btn').innerHTML = '<i class="fas fa-sync"></i> Update Asset';
 
+        document.getElementById('customAssetId').value = a.AssetID || '';
         document.getElementById('assetName').value = a.name || '';
         document.getElementById('ownership').value = a.ownership || 'Own';
         document.getElementById('status').value = a.status || 'Working';
@@ -1475,6 +1494,7 @@
         const payload = {
             action: isEditing ? 'editAsset' : 'addAsset',
             id: editId,
+            AssetID: document.getElementById('customAssetId').value,
             name: document.getElementById('assetName').value,
             ownership: document.getElementById('ownership').value,
             status: document.getElementById('status').value,
